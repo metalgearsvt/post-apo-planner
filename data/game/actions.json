@@ -12,7 +12,7 @@
    "income is per 9-second tick unless noted."
   ]
  },
- "count": 72,
+ "count": 78,
  "data": [
   {
    "key": "sell_toy_cytrium_notsaved",
@@ -1076,6 +1076,67 @@
    }
   },
   {
+   "key": "feedthefish_notsaved4",
+   "id": 174,
+   "name": "Gamma Experiment",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 149,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "uranium": 1000000,
+    "cytrium": 300
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Water"
+    ],
+    "only": [
+     "fish_small",
+     "fish",
+     "fish_big"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Gamma Experiment",
+    "id": 174,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     102
+    ],
+    "grid_key": "feedthefish_notsaved4",
+    "only_specific_tiles": [
+     "fish_small",
+     "fish",
+     "fish_big"
+    ],
+    "cost": {
+     "uranium_battery": 1000000,
+     "cytrium": 300
+    },
+    "no_water_pavement": true,
+    "show_tile_in_build_grid": "water",
+    "big_fish_placement_is_ok": true,
+    "has_quick_tool": 1,
+    "required_level": 149,
+    "display_even_if_has_street": 1,
+    "has_size_tool": 1,
+    "is_terrain_modifier": 1,
+    "can_use_with_big_ship": 1,
+    "big_recalculations": true,
+    "can_put_into_storage": true
+   }
+  },
+  {
    "key": "feedthefish_notsaved",
    "id": 40,
    "name": "Premium Fish",
@@ -1131,6 +1192,136 @@
     "can_use_with_ship": 1,
     "big_recalculations": true,
     "can_put_into_storage": true
+   }
+  },
+  {
+   "key": "feedthefish_notsaved2",
+   "id": 39,
+   "name": "Feed the fish",
+   "category": [
+    "Special"
+   ],
+   "level": 34,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 90000,
+    "food": 10000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Water"
+    ],
+    "only": [
+     "fish_small+deep_water",
+     "fish_small+deep_water2"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Feed the fish",
+    "id": 39,
+    "categories": [
+     3
+    ],
+    "tile_categories": [
+     102
+    ],
+    "grid_key": "feedthefish_notsaved2",
+    "only_specific_tiles": [
+     "fish_small+deep_water",
+     "fish_small+deep_water2"
+    ],
+    "cost": {
+     "gold": 90000,
+     "food": 10000
+    },
+    "no_water_pavement": true,
+    "show_tile_in_build_grid": "water",
+    "big_fish_placement_is_ok": true,
+    "has_quick_tool": 1,
+    "required_level": 34,
+    "display_even_if_has_street": 1,
+    "has_size_tool": 1,
+    "is_terrain_modifier": 1,
+    "can_use_with_ship": 1,
+    "works_even_with_building": 1,
+    "big_recalculations": true
+   }
+  },
+  {
+   "key": "feedthefish_notsaved3",
+   "id": 173,
+   "name": "Fish Husbandry",
+   "category": [
+    "Special"
+   ],
+   "level": 141,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Water"
+    ],
+    "only": [
+     "water"
+    ],
+    "forbidden": [
+     "fish_small",
+     "fish",
+     "fish_big",
+     "fish_huge",
+     "oil"
+    ]
+   },
+   "rules": {
+    "requires_road": false
+   },
+   "description": "Creates a small fish school.",
+   "raw": {
+    "name": "Fish Husbandry",
+    "id": 173,
+    "categories": [
+     3
+    ],
+    "tile_categories": [
+     102
+    ],
+    "grid_key": "feedthefish_notsaved3",
+    "description": "Creates a small fish school.",
+    "only_specific_tiles": [
+     "water"
+    ],
+    "forbidden_tiles": [
+     "fish_small",
+     "fish",
+     "fish_big",
+     "fish_huge",
+     "oil"
+    ],
+    "no_water_pavement": true,
+    "show_tile_in_build_grid": "water",
+    "big_fish_placement_is_ok": true,
+    "has_quick_tool": 1,
+    "can_use_with_ship": 1,
+    "required_level": 141,
+    "display_even_if_has_street": 1,
+    "has_size_tool": 1,
+    "is_terrain_modifier": 1,
+    "requires_street": false,
+    "is_water_building": true,
+    "works_even_with_building": 1,
+    "big_recalculations": true
    }
   },
   {
@@ -1378,6 +1569,114 @@
     "works_even_with_building": 1,
     "eco_tokens_for_this_action": 750,
     "is_terrain_modifier": 2
+   }
+  },
+  {
+   "key": "built_ground_oil_notsaved2",
+   "id": 53,
+   "name": "Fill",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 200000,
+    "clay": 25
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "rift"
+    ]
+   },
+   "rules": {
+    "requires_upgrade": 34
+   },
+   "description": "Fill the rift with clay.",
+   "raw": {
+    "name": "Fill",
+    "id": 53,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "built_ground_oil_notsaved2",
+    "description": "Fill the rift with clay.",
+    "only_specific_tiles": [
+     "rift"
+    ],
+    "cost": {
+     "gold": 200000,
+     "clay": 25
+    },
+    "requires_upgrade": 34,
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "required_level": 0
+   }
+  },
+  {
+   "key": "built_ground_oil_notsaved3",
+   "id": 54,
+   "name": "Big Fill",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "clay": 150,
+    "gold": 1200000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "rift_big"
+    ]
+   },
+   "rules": {
+    "requires_upgrade": 34
+   },
+   "description": "Fill the rift with clay.",
+   "raw": {
+    "name": "Big Fill",
+    "id": 54,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "built_ground_oil_notsaved3",
+    "description": "Fill the rift with clay.",
+    "only_specific_tiles": [
+     "rift_big"
+    ],
+    "cost": {
+     "clay": 150,
+     "gold": 1200000
+    },
+    "requires_upgrade": 34,
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "required_level": 0
    }
   },
   {
@@ -2961,6 +3260,51 @@
     "also_allowed_tiles": [
      "digged"
     ]
+   }
+  },
+  {
+   "key": "fill_ast_pit_notsaved2",
+   "id": 163,
+   "name": "Clear debris",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 1700000,
+    "clay": 3
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "asteroid_2",
+     "asteroid_3"
+    ]
+   },
+   "rules": {},
+   "description": "Fill",
+   "raw": {
+    "name": "Clear debris",
+    "id": 163,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "fill_ast_pit_notsaved2",
+    "description": "Fill",
+    "only_specific_tiles": [
+     "asteroid_2",
+     "asteroid_3"
+    ],
+    "cost": {
+     "gold": 1700000,
+     "clay": 3
+    },
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "required_level": 0
    }
   },
   {

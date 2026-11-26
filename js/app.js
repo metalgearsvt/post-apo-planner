@@ -2,6 +2,7 @@ import { RESOURCES, RES_LABEL, CAT_COLORS, GAME_SOURCE } from './data.js';
 import {
   catalog, bColor, abbr, saveBuilding, resetBuilding, deleteCustomBuilding, saveTerrain,
   deleteCustomTerrain, exportCatalog, importCatalog, resetCatalog, isDefaultBuilding,
+  getProfile, profileActive, setProfile, setProfileEnabled, clearProfile,
 } from './catalog.js';
 import { analyze, effRadius, waterRange } from './analyze.js';
 import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack } from './icons.js';
@@ -86,7 +87,15 @@ const canvas = $('#canvas'), ctx = canvas.getContext('2d');
 const stage = $('#stage');
 const isMobile = () => matchMedia('(max-width: 899px)').matches;
 
-function reanalyze() { result = analyze(plan, settings); }
+// With account values on, upgrade effects already in those numbers are switched off so they aren't counted
+// twice, and the remaining toggles come from the upgrades the account owns.
+function analysisSettings() {
+  if (!profileActive()) return settings;
+  const p = getProfile(), up = { ...settings.upgrades, ...(p.upgrades || {}) };
+  for (const k of p.baked || []) up[k] = false;
+  return { ...settings, upgrades: up };
+}
+function reanalyze() { result = analyze(plan, analysisSettings()); }
 
 // =====================================================================
 // Editing + history
@@ -351,8 +360,8 @@ function roundRect(x, y, w, h, r) {
 }
 function drawRadius(i, b, rgba) {
   if (!b) return;
-  let r = effRadius(b, settings);
-  if (!r && b.rules?.includes('nearWater2')) r = waterRange(b, settings);
+  let r = effRadius(b, analysisSettings());
+  if (!r && b.rules?.includes('nearWater2')) r = waterRange(b, analysisSettings());
   if (!r && b.rules?.includes('needFoundry3')) r = 3;
   if (!r) return;
   const { w, h } = plan, s = view.scale;
@@ -722,6 +731,7 @@ function dataSourceHTML(b) {
   const parts = [];
   if (b.source === 'game') parts.push(`Game ${esc(GAME_SOURCE.app_version)} (base values)`);
   else if (b.source === 'wiki') parts.push('Wiki only');
+  if (b.profileFields?.length) parts.push(`<span style="color:#7fc8ff">your account: ${esc(b.profileFields.join(', '))}</span>`);
   if (b.fallback?.length) parts.push(`<span style="color:#ff9f43">wiki fallback: ${esc(b.fallback.join(', '))}</span>`);
   if (b.edited) parts.push('edited by you');
   return parts.join('<br>') || '—';
@@ -747,7 +757,7 @@ function renderInfo() {
       <tr><td>Pollution</td><td class="n">${sign(eff.poll ?? b.poll ?? 0)}</td></tr>
       ${eff.uranium ? `<tr><td>U-Battery use</td><td class="n">${sign(eff.uranium)}</td></tr>` : ''}
       ${Object.keys(eff.income || {}).length ? `<tr><td>Income / 9s</td><td class="n">${Object.entries(eff.income).map(([k, v]) => `${sign(v)} ${RES_LABEL[k] || k}`).join(', ')}</td></tr>` : ''}
-      ${b.radius ? `<tr><td>Radius</td><td class="n">${effRadius(b, settings)}</td></tr>` : ''}
+      ${b.radius ? `<tr><td>Radius</td><td class="n">${effRadius(b, analysisSettings())}</td></tr>` : ''}
       ${b.tiles?.length ? `<tr><td>Placeable on</td><td class="n">${b.tiles.map(id => esc(catalog.tMap.get(id)?.name || id)).join(', ')}</td></tr>` : ''}
       ${b.storage ? `<tr><td>Storage</td><td class="n">${Object.entries(b.storage).map(([k, v]) => `${fmt(v)} ${RES_LABEL[k] || k}`).join(', ')}</td></tr>` : ''}
       <tr><td>Data</td><td class="n small">${dataSourceHTML(b)}</td></tr>
@@ -803,7 +813,7 @@ window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); defe
 async function menuDialog() {
   const items = [
     ['new', '➕  New plan…'], ['plans', '📂  My plans…'], ['resize', '⇲  Resize grid…'],
-    ['settings', '⚙  Settings & upgrades…'], ['catalog', '🧱  Catalog editor (buildings & terrain)…'], ['icons', '🎨  Game icons…'], ['gamemap', '🗺  Import game map…'],
+    ['settings', '⚙  Settings & upgrades…'], ['catalog', '🧱  Catalog editor (buildings & terrain)…'], ['icons', '🎨  Game icons…'], ['gamemap', '🗺  Import game map…'], ['profile', '👤  My account values…'],
     ['share', '🔗  Copy share code'], ['paste', '📋  Load from share code…'],
     ['export', '⬇  Export plan file'], ['exportAll', '⬇  Export all plans (backup)'], ['import', '⬆  Import plan file…'],
     ...(deferredInstall ? [['install', '📱  Install as app']] : []),
@@ -818,7 +828,7 @@ function runMenu(k) {
   ({
     new: newPlanDialog, plans: plansDialog, resize: resizeDialog, settings: settingsDialog, catalog: catalogDialog,
     share: copyShareCode, paste: pasteShareDialog, export: () => exportFile(false), exportAll: () => exportFile(true),
-    import: () => $('#fileImport').click(), help: helpDialog, icons: iconsDialog, gamemap: () => $('#mapImport').click(),
+    import: () => $('#fileImport').click(), help: helpDialog, icons: iconsDialog, gamemap: () => $('#mapImport').click(), profile: profileDialog,
     install: async () => { deferredInstall.prompt(); await deferredInstall.userChoice; deferredInstall = null; },
   })[k]?.();
 }
@@ -907,6 +917,7 @@ async function settingsDialog() {
   const v = await modal('Settings & upgrades', `
     <label class="f">Your Main Settlement level (0 = ignore)<input name="level" type="number" min="0" max="999" value="${settings.level || 0}"></label>
     <h3>Upgrades that change layout math</h3>
+    ${profileActive() ? '<p class="note">Your account values are on: these come from your game (Menu → My account values), so the boxes below are ignored.</p>' : ''}
     <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="bigFarms" ${u.bigFarms ? 'checked' : ''}> Big Farms — farm radius +1</label><br>
     <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="farmImplements" ${u.farmImplements ? 'checked' : ''}> Farming Implements — ×2 food per field</label><br>
     <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="advSaw" ${u.advSaw ? 'checked' : ''}> Advanced Saw — lumber mill radius +1</label><br>
@@ -1062,6 +1073,38 @@ async function iconsDialog() {
     const f = inp.files[0]; inp.value = ''; if (!f) return;
     try { await importPack(JSON.parse(await f.text())); renderPalette(); draw(); toast(`Icon pack imported (${icons.b.size + icons.t.size} icons)`); }
     catch (err) { alert('Icon import failed: ' + err.message); }
+  });
+}
+
+// ----- account values (profile built from your own game by tools/re/build_profile.mjs)
+async function profileDialog() {
+  const p = getProfile();
+  const status = !p ? 'Not loaded. Totals use base values (no upgrades) plus the upgrade boxes in Settings.'
+    : `Loaded: values for ${Object.keys(p.buildings).length} buildings with your upgrades applied (game ${esc(p.app_version || '?')}, read ${esc(p.extracted || '?')}, town level ${esc(p.level ?? '?')}).`;
+  const v = await modal('My account values', `
+    <p class="small">${status}</p>
+    ${p ? `<label class="chk" style="font-size:14px"><input type="checkbox" name="on" ${profileActive() ? 'checked' : ''}> Use my account values</label>` : ''}
+    <p class="note">Base game values assume no upgrades. Load the <code>profile.json</code> made from your own game
+      (<code>node tools/re/build_profile.mjs</code>, see tools/re/README.md) so production, power, pollution, costs, ranges and
+      storage match what you have. It's stored only in this browser. The Inspect panel marks values that come from it.</p>`,
+    [{ label: 'Load profile…', value: 'load', novalidate: true },
+      ...(p ? [{ label: 'Remove', value: 'remove', cls: 'btn-danger', novalidate: true }] : []),
+      { label: 'Done', cls: 'btn-primary', value: 'done' }],
+    (d, f) => f.on?.addEventListener('change', () => { setProfileEnabled(f.on.checked); afterCatalogChange(); }));
+  if (v === 'load') $('#profileImport').click();
+  if (v === 'remove') { clearProfile(); afterCatalogChange(); toast('Account values removed'); }
+}
+{
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json'; inp.id = 'profileImport'; inp.hidden = true;
+  document.body.appendChild(inp);
+  inp.addEventListener('change', async () => {
+    const f = inp.files[0]; inp.value = ''; if (!f) return;
+    try {
+      const p = JSON.parse(await f.text()); setProfile(p);
+      if (p.level && !settings.level) { settings.level = p.level; saveSettings(); }
+      afterCatalogChange();
+      toast(`Account values loaded for ${Object.keys(p.buildings).length} buildings`);
+    } catch (err) { alert('Could not load account values: ' + err.message); }
   });
 }
 

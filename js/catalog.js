@@ -1,4 +1,5 @@
-// Catalog = wiki defaults (data.js) + the user's edits and custom entries (localStorage).
+// Catalog = game data with wiki fallback (data.js), then optionally the player's own upgraded values
+// (an account profile, see tools/re/build_profile.mjs), then the user's edits and custom entries (localStorage).
 import { TERRAIN, BUILDINGS, CATEGORIES, CAT_COLORS } from './data.js';
 
 const KEY = 'pat.catalog.v1';
@@ -11,6 +12,25 @@ function load() {
 
 let user = load();
 
+// ----- account profile: per-building values with the player's upgrades applied
+const PKEY = 'pat.profile.v1';
+let profile = (() => { try { return JSON.parse(localStorage.getItem(PKEY)) || null; } catch { return null; } })();
+export function getProfile() { return profile; }
+export function profileActive() { return !!(profile && profile.enabled !== false); }
+export function setProfile(p) {
+  if (!p || p.kind !== 'post-apo-planner-profile' || typeof p.buildings !== 'object') throw new Error('Not an account values file');
+  profile = { ...p, enabled: true };
+  localStorage.setItem(PKEY, JSON.stringify(profile)); rebuild();
+}
+export function setProfileEnabled(on) { if (!profile) return; profile.enabled = !!on; localStorage.setItem(PKEY, JSON.stringify(profile)); rebuild(); }
+export function clearProfile() { profile = null; localStorage.removeItem(PKEY); rebuild(); }
+function withProfile(b) {
+  const o = profileActive() && profile.buildings[b.id];
+  if (!o) return b;
+  return { ...b, ...o, income: o.income ? { ...(b.income || {}), ...o.income } : b.income, profileFields: Object.keys(o) };
+}
+const baseOf = (id) => { const b = BUILDINGS.find(x => x.id === id); return b && withProfile(b); };
+
 export const catalog = {
   terrain: [], buildings: [], tMap: new Map(), bMap: new Map(),
   categories: [...CATEGORIES],
@@ -19,7 +39,7 @@ export const catalog = {
 export function rebuild() {
   catalog.terrain = [...TERRAIN, ...user.customTerrain.map(t => ({ ...t, custom: true }))];
   catalog.buildings = [
-    ...BUILDINGS.map(b => user.buildings[b.id] ? { ...b, ...user.buildings[b.id], edited: true } : b),
+    ...BUILDINGS.map(withProfile).map(b => user.buildings[b.id] ? { ...b, ...user.buildings[b.id], edited: true } : b),
     ...user.customBuildings.map(b => ({ ...b, custom: true })),
   ];
   catalog.tMap = new Map(catalog.terrain.map(t => [t.id, t]));
@@ -36,10 +56,10 @@ export function isDefaultBuilding(id) { return BUILDINGS.some(b => b.id === id);
 
 export function saveBuilding(b) {
   if (isDefaultBuilding(b.id)) {
-    const base = BUILDINGS.find(x => x.id === b.id);
+    const base = baseOf(b.id);
     const patch = {};
     for (const [k, v] of Object.entries(b)) {
-      if (k === 'edited' || k === 'custom') continue;
+      if (k === 'edited' || k === 'custom' || k === 'profileFields') continue;
       if (JSON.stringify(base[k]) !== JSON.stringify(v)) patch[k] = v;
     }
     if (Object.keys(patch).length) user.buildings[b.id] = patch; else delete user.buildings[b.id];

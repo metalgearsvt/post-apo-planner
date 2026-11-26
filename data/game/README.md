@@ -8,10 +8,10 @@ Every file has the same envelope: `{ "source": {...}, "count": N, "data": [...] 
 
 | File | What's in it |
 |---|---|
-| `buildings.json` | 162 placeable buildings: cost, power, pollution, income, storage, radius, allowed tiles, placement rules, pavement bonus, unlock level. `raw` keeps every other static field the game defines. |
+| `buildings.json` | 156 placeable buildings: cost, power, pollution, income, storage, radius, allowed tiles, placement rules, pavement bonus, unlock level. `raw` keeps every other static field the game defines. |
 | `roads.json` | The 8 road types with costs on plain, river/swamp, and sea tiles. Wiki "bridges" are roads built on river/sea. |
 | `forests.json` | The 6 plantable forest types (Grow Forest action): cost, gold income, pollution. |
-| `actions.json` | 72 tile actions (clear rubble, dig, revitalise, flatten, fill, …). Many prices are calculated, so `cost` is often `null`. |
+| `actions.json` | 78 tile actions (clear rubble, dig, revitalise, flatten, fill, …). Many prices are calculated, so `cost` is often `null`. |
 | `terrains.json` | 44 terrain tile keys. |
 | `upgrades.json` | 796 upgrades: base cost, gem cost, how cost grows per level, max level, the building affected, minimum town level. |
 | `level_unlocks.json` | 86 named unlock levels (`STEEL_LEVEL_REQ: 24`, …). |

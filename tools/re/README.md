@@ -39,6 +39,11 @@ Raw game files (APK, JS bundle, images) live in `re/`, which git ignores. **Neve
    ```
    node tools/re/cdp_extract.mjs <ws> re/account/grid.json @tools/re/exprs_grid.json
    ```
+   Your account values (Menu → My account values…): after reading your logged-in game into
+   re/account/eff_*.json and player.json (see "Account data" below), build the profile:
+   ```
+   node tools/re/build_profile.mjs    # -> re/account/profile.json (upgraded values; no identifiers)
+   ```
    Local icon pack (output is git-ignored; never commit or host it):
    ```
    node tools/re/build_icons.mjs      # -> icons/game/ (sprite sheets + manifest.json)
@@ -48,6 +53,18 @@ Raw game files (APK, JS bundle, images) live in `re/`, which git ignores. **Neve
 
 The page HTML contains the session's bearer token and user id. `cdp_dump.mjs` redacts the token from the URL, and the HTML
 copy was redacted by hand. Check before sharing anything from `re/`.
+
+## Account data
+
+Read from the logged-in game, saved only in `re/account/` (git-ignored). Name, email, player id, country, language, town names
+and visited players are stripped before anything is saved.
+- `player.json`: player object `hrac` (resources, income, building counts, stats), town level, upgrade levels.
+- `eff_tables.json`, `eff_getters.json`, `eff_roads.json`, `eff_forests.json`: the same tables as the base extraction, read
+  with your upgrades applied.
+- `grid.json`: your map (for Import game map). `summary.md`: readable overview.
+- `profile.json`: made by `build_profile.mjs`. Per-building overrides where your values differ from base, plus the planner
+  upgrade toggles your account owns. Toggles whose effect is already in the numbers (Big Farms, Farming Implements,
+  Better Farm Watering) are listed as `baked` and ignored while the profile is on.
 
 ## How the planner uses it
 

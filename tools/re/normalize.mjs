@@ -103,7 +103,7 @@ function cleanRaw(b) {
 
 const buildings = [], actions = [];
 for (const b of tables.BUILDINGS) {
-  const isAction = b.grid_key.endsWith('_notsaved') || b.is_action;
+  const isAction = /_notsaved\d*$/.test(b.grid_key) || b.is_action;
   const level = UNLOCK_PLACEHOLDERS.has(b.required_level) ? null : b.required_level;
   const gems = (b.cost && b.cost.gems) || b.gems || 0;
   const entry = {
@@ -207,7 +207,7 @@ const levelUnlocks = Object.entries(levels).filter(([, v]) => typeof v === 'numb
 const constants = Object.fromEntries(Object.entries(getters).map(([k, v]) => [k.replace(/^Get|\(\)$/g, ''), v]));
 Object.assign(constants, {
   INCOME_INTERVAL_SECONDS: 9,
-  SUPER_FACTORY_INCOME: 5000,
+  SUPER_FACTORY_INCOME: tables.SUPER_FACTORY_INCOME ?? 5000, // gems.js; upgrades raise it
   PUMPKIN_FARM_LEVELS: tables.PUMPKIN_FARM_LEVELS,
   TURKEY_FARM_LEVELS: tables.TURKEY_FARM_LEVELS,
   RABBITS_FARM_LEVELS: tables.RABBITS_FARM_LEVELS,

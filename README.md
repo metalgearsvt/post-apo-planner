@@ -19,6 +19,8 @@ home screen, and works offline. There's no build step — plain HTML/CSS/JS.
 - **Game icons (optional, local only)**: build an icon pack from your own copy of the game and the planner draws
   real building and terrain art. No game art is included in this repository or the hosted app.
   Menu → Game icons… also exports a pack file you can import on your phone.
+- **Your account values (optional)**: Menu → My account values… loads a profile of the building values your
+  upgrades produce, so production, power, pollution, costs, ranges and storage match your game.
 - **Import your game map**: Menu → Import game map… turns a map exported from the game into a plan
   (up to 200 × 200 tiles around any point, buildings, roads, rails and pavement included).
 - **Phone ↔ desktop**: share codes (copy/paste text) or export/import JSON files.

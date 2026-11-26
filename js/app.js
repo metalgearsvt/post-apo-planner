@@ -1,9 +1,11 @@
-import { RESOURCES, RES_LABEL, CAT_COLORS } from './data.js';
+import { RESOURCES, RES_LABEL, CAT_COLORS, GAME_SOURCE } from './data.js';
 import {
   catalog, bColor, abbr, saveBuilding, resetBuilding, deleteCustomBuilding, saveTerrain,
   deleteCustomTerrain, exportCatalog, importCatalog, resetCatalog, isDefaultBuilding,
 } from './catalog.js';
-import { analyze, effRadius } from './analyze.js';
+import { analyze, effRadius, waterRange } from './analyze.js';
+import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack } from './icons.js';
+import { readGrid, gridBounds, gridToPlan } from './gamemap.js';
 
 // =====================================================================
 // Persistence
@@ -11,8 +13,8 @@ import { analyze, effRadius } from './analyze.js';
 const LS = { plans: 'pat.plans.v1', cur: 'pat.current.v1', settings: 'pat.settings.v1' };
 const DEFAULT_SETTINGS = {
   level: 0, hideLocked: false, showGrid: true, showLabels: true, showFields: true, checkRoads: true,
-  upgrades: { bigFarms: false, farmImplements: false, advSaw: false, roadless: false },
-  palKind: 'building', collapsed: {},
+  upgrades: { bigFarms: false, farmImplements: false, advSaw: false, roadless: false, farmWatering: false },
+  palKind: 'building', collapsed: {}, useIcons: true,
 };
 const readJSON = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
 let settings = { ...DEFAULT_SETTINGS, ...readJSON(LS.settings, {}) };
@@ -209,7 +211,9 @@ function drawNow() {
     const X = px(x), Y = py(y);
     const col = t?.color || '#ff00ff';
     ctx.fillStyle = col; ctx.fillRect(X, Y, s + 0.5, s + 0.5);
-    if (s >= 10 && t) drawTerrainDecor(t, X, Y, s, x, y);
+    const tIcon = s >= 8 && settings.useIcons ? icons.t.get(terrain[i]) : null;
+    if (tIcon) ctx.drawImage(tIcon, X, Y, s + 0.5, s + 0.5);
+    else if (s >= 10 && t) drawTerrainDecor(t, X, Y, s, x, y);
     if (settings.showFields && result?.fieldOwner.has(i)) {
       ctx.strokeStyle = 'rgba(240,210,90,.75)'; ctx.lineWidth = Math.max(1, s / 14);
       ctx.beginPath();
@@ -315,6 +319,12 @@ function drawBuilding(b, i, x, y, X, Y, s, alpha, ghost = false) {
     if (isR && s >= 12) { ctx.strokeStyle = '#c9c9c9'; ctx.lineWidth = 1; ctx.strokeRect(X + o + 1, Y + o + 1, rw - 2, rw - 2); }
     return;
   }
+  const bIcon = s >= 8 && settings.useIcons ? icons.b.get(b.id) : null;
+  if (bIcon) {
+    ctx.drawImage(bIcon, X, Y, s, s);
+    if (b.premium && s >= 14) { ctx.fillStyle = '#c86fe0'; ctx.beginPath(); ctx.arc(X + s * .85, Y + s * .85, s * .08, 0, 7); ctx.fill(); }
+    return;
+  }
   if (b.cat === 'Trees') {
     const tc = b.color || (b.id === 'sakura' ? '#e9a1c0' : b.id === 'winterforest' ? '#d8eef2' : b.id === 'palmtree' ? '#5fae3d' : '#1f7a2c');
     ctx.fillStyle = shade(tc, -0.15); ctx.beginPath(); ctx.arc(X + s * .35, Y + s * .6, s * .22, 0, 7); ctx.fill();
@@ -342,7 +352,7 @@ function roundRect(x, y, w, h, r) {
 function drawRadius(i, b, rgba) {
   if (!b) return;
   let r = effRadius(b, settings);
-  if (!r && b.rules?.includes('nearWater2')) r = 2;
+  if (!r && b.rules?.includes('nearWater2')) r = waterRange(b, settings);
   if (!r && b.rules?.includes('needFoundry3')) r = 3;
   if (!r) return;
   const { w, h } = plan, s = view.scale;
@@ -593,6 +603,8 @@ function bSummary(b) {
 }
 function chipHTML(b) {
   const c = bColor(b);
+  const url = settings.useIcons ? iconURL('b', b.id) : null;
+  if (url) return `<span class="chip img"><img src="${url}" alt=""></span>`;
   if (b.isRoad) return `<span class="chip" style="background:#7fae4c"><span class="in" style="inset:10px 0;border-radius:0;background:${b.color || '#8a8a8a'}"></span></span>`;
   return `<span class="chip" style="background:${c};color:${lum(c) > .55 ? '#111' : '#fff'}">${esc(abbr(b))}</span>`;
 }
@@ -614,7 +626,7 @@ function renderPalette() {
       const ts = catalog.terrain.filter(t => (t.group || 'land') === g && (!q || t.name.toLowerCase().includes(q)));
       if (!ts.length) continue;
       html += `<div class="pal-group"><h4>${label}</h4><div class="pal-items pal-terrain">` +
-        ts.map(t => `<button class="pal-item ${t.id === selTerrain ? 'sel' : ''}" data-t="${esc(t.id)}"><span class="chip" style="background:${t.color}"></span><span class="nm">${esc(t.name)}</span></button>`).join('') +
+        ts.map(t => `<button class="pal-item ${t.id === selTerrain ? 'sel' : ''}" data-t="${esc(t.id)}"><span class="chip ${settings.useIcons && iconURL('t', t.id) ? 'img' : ''}" style="background:${t.color}">${settings.useIcons && iconURL('t', t.id) ? `<img src="${iconURL('t', t.id)}" alt="">` : ''}</span><span class="nm">${esc(t.name)}</span></button>`).join('') +
         `</div></div>`;
     }
     list.innerHTML = html || '<p class="muted">No matches.</p>';
@@ -704,6 +716,17 @@ function centerOn(i) {
 // =====================================================================
 // Inspect tab
 // =====================================================================
+// Where a building's numbers come from: mined game data, with wiki values only as a fallback.
+function dataSourceHTML(b) {
+  if (b.custom) return 'Custom entry';
+  const parts = [];
+  if (b.source === 'game') parts.push(`Game ${esc(GAME_SOURCE.app_version)} (base values)`);
+  else if (b.source === 'wiki') parts.push('Wiki only');
+  if (b.fallback?.length) parts.push(`<span style="color:#ff9f43">wiki fallback: ${esc(b.fallback.join(', '))}</span>`);
+  if (b.edited) parts.push('edited by you');
+  return parts.join('<br>') || '—';
+}
+
 function renderInfo() {
   const el = $('#tab-info');
   if (selCell < 0 || !plan || selCell >= plan.w * plan.h) { el.innerHTML = '<p class="muted">Use the 🔍 Inspect tool (or tap with ✋ Pan) to see details for a tile.</p>'; return; }
@@ -726,6 +749,8 @@ function renderInfo() {
       ${Object.keys(eff.income || {}).length ? `<tr><td>Income / 9s</td><td class="n">${Object.entries(eff.income).map(([k, v]) => `${sign(v)} ${RES_LABEL[k] || k}`).join(', ')}</td></tr>` : ''}
       ${b.radius ? `<tr><td>Radius</td><td class="n">${effRadius(b, settings)}</td></tr>` : ''}
       ${b.tiles?.length ? `<tr><td>Placeable on</td><td class="n">${b.tiles.map(id => esc(catalog.tMap.get(id)?.name || id)).join(', ')}</td></tr>` : ''}
+      ${b.storage ? `<tr><td>Storage</td><td class="n">${Object.entries(b.storage).map(([k, v]) => `${fmt(v)} ${RES_LABEL[k] || k}`).join(', ')}</td></tr>` : ''}
+      <tr><td>Data</td><td class="n small">${dataSourceHTML(b)}</td></tr>
     </table>
     ${b.desc ? `<p class="small">${esc(b.desc)}</p>` : ''}`;
     for (const n of eff.notes || []) html += `<div class="issue info">${esc(n)}</div>`;
@@ -778,7 +803,7 @@ window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); defe
 async function menuDialog() {
   const items = [
     ['new', '➕  New plan…'], ['plans', '📂  My plans…'], ['resize', '⇲  Resize grid…'],
-    ['settings', '⚙  Settings & upgrades…'], ['catalog', '🧱  Catalog editor (buildings & terrain)…'],
+    ['settings', '⚙  Settings & upgrades…'], ['catalog', '🧱  Catalog editor (buildings & terrain)…'], ['icons', '🎨  Game icons…'], ['gamemap', '🗺  Import game map…'],
     ['share', '🔗  Copy share code'], ['paste', '📋  Load from share code…'],
     ['export', '⬇  Export plan file'], ['exportAll', '⬇  Export all plans (backup)'], ['import', '⬆  Import plan file…'],
     ...(deferredInstall ? [['install', '📱  Install as app']] : []),
@@ -793,7 +818,7 @@ function runMenu(k) {
   ({
     new: newPlanDialog, plans: plansDialog, resize: resizeDialog, settings: settingsDialog, catalog: catalogDialog,
     share: copyShareCode, paste: pasteShareDialog, export: () => exportFile(false), exportAll: () => exportFile(true),
-    import: () => $('#fileImport').click(), help: helpDialog,
+    import: () => $('#fileImport').click(), help: helpDialog, icons: iconsDialog, gamemap: () => $('#mapImport').click(),
     install: async () => { deferredInstall.prompt(); await deferredInstall.userChoice; deferredInstall = null; },
   })[k]?.();
 }
@@ -885,7 +910,8 @@ async function settingsDialog() {
     <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="bigFarms" ${u.bigFarms ? 'checked' : ''}> Big Farms — farm radius +1</label><br>
     <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="farmImplements" ${u.farmImplements ? 'checked' : ''}> Farming Implements — ×2 food per field</label><br>
     <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="advSaw" ${u.advSaw ? 'checked' : ''}> Advanced Saw — lumber mill radius +1</label><br>
-    <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="roadless" ${u.roadless ? 'checked' : ''}> Surrounded by Nature — farms & mills don't need roads</label>
+    <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="roadless" ${u.roadless ? 'checked' : ''}> Surrounded by Nature — farms & mills don't need roads</label><br>
+    <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="farmWatering" ${u.farmWatering ? 'checked' : ''}> Better Farm Watering — Big Farms up to 6 tiles from water</label>
     <h3>Display & checks</h3>
     <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="checkRoads" ${settings.checkRoads ? 'checked' : ''}> Warn when buildings aren't road-connected to a settlement</label><br>
     <label class="chk" style="font-size:14px;margin-bottom:6px"><input type="checkbox" name="showFields" ${settings.showFields ? 'checked' : ''}> Show farm fields</label><br>
@@ -894,7 +920,7 @@ async function settingsDialog() {
     [{ label: 'Cancel', value: null, novalidate: true }, { label: 'Save', cls: 'btn-primary', collect: (f) => { const fd = new FormData(f); return { level: +fd.get('level') || 0, on: (n) => fd.get(n) === 'on' }; } }]);
   if (!v) return;
   settings.level = v.level;
-  for (const k of ['bigFarms', 'farmImplements', 'advSaw', 'roadless']) settings.upgrades[k] = v.on(k);
+  for (const k of ['bigFarms', 'farmImplements', 'advSaw', 'roadless', 'farmWatering']) settings.upgrades[k] = v.on(k);
   for (const k of ['checkRoads', 'showFields', 'showGrid', 'showLabels']) settings[k] = v.on(k);
   saveSettings(); renderPalette(); changed(false);
 }
@@ -1004,6 +1030,75 @@ async function editTerrainDialog(t) {
   afterCatalogChange();
 }
 
+// ----- game icons (optional, user-supplied; see js/icons.js)
+async function iconsDialog() {
+  const n = icons.b.size + icons.t.size;
+  const status = !icons.source ? 'No icon pack loaded: buildings and terrain are drawn as coloured tiles.'
+    : `${icons.b.size} building and ${icons.t.size} terrain icons loaded from ${icons.source === 'folder' ? 'the local <code>icons/game/</code> folder' : 'an imported icon pack (stored in this browser)'}.`;
+  const v = await modal('Game icons', `
+    <p class="small">${status}</p>
+    <label class="chk" style="font-size:14px"><input type="checkbox" name="use" ${settings.useIcons ? 'checked' : ''}> Show game icons</label>
+    <p class="note">The planner doesn't include any game art. To see icons, build them from your own copy of the game
+      (<code>node tools/re/build_icons.mjs</code>, see tools/re/README.md), then on this device use <b>Export icon pack</b> and,
+      on your phone, <b>Import icon pack</b>. Packs are for your own use only; please don't share them.</p>`,
+    [
+      { label: 'Import icon pack…', value: 'import', novalidate: true },
+      ...(n ? [{ label: 'Export icon pack', value: 'export', novalidate: true }] : []),
+      ...(icons.source === 'imported' ? [{ label: 'Remove imported pack', value: 'remove', cls: 'btn-danger', novalidate: true }] : []),
+      { label: 'Done', cls: 'btn-primary', value: 'done' },
+    ], (d, f) => f.use.addEventListener('change', () => { settings.useIcons = f.use.checked; saveSettings(); renderPalette(); draw(); }));
+  if (v === 'import') $('#iconImport').click();
+  if (v === 'export') {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(exportPack())], { type: 'application/json' }));
+    a.download = 'post-apo-icon-pack.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  if (v === 'remove') { await removeImportedPack(); renderPalette(); draw(); toast('Imported icon pack removed'); }
+}
+{
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json'; inp.id = 'iconImport'; inp.hidden = true;
+  document.body.appendChild(inp);
+  inp.addEventListener('change', async () => {
+    const f = inp.files[0]; inp.value = ''; if (!f) return;
+    try { await importPack(JSON.parse(await f.text())); renderPalette(); draw(); toast(`Icon pack imported (${icons.b.size + icons.t.size} icons)`); }
+    catch (err) { alert('Icon import failed: ' + err.message); }
+  });
+}
+
+// ----- game map import (a map exported from the running game, see tools/re/README.md)
+async function gameMapDialog(grid, fileName) {
+  const B = gridBounds(grid);
+  const v = await modal('Import game map', `
+    <p class="small">${fmt(B.tiles)} explored tiles, ${fmt(B.buildings)} buildings. Map spans x ${B.x0}…${B.x1}, y ${B.y0}…${B.y1};
+      your main settlement is at (0, 0).</p>
+    <p class="note">Plans are at most 200 × 200 tiles, so pick the area to bring in. Unexplored tiles become "Unexplored".</p>
+    <label class="f">Plan name<input name="name" required value="${esc(fileName.replace(/\.json$/i, '') || 'Game map')}"></label>
+    <div class="two"><label class="f">Centre x<input name="cx" type="number" value="0" required></label>
+    <label class="f">Centre y<input name="cy" type="number" value="0" required></label></div>
+    <div class="two"><label class="f">Width (tiles)<input name="w" type="number" min="3" max="200" value="${Math.min(200, B.w)}" required></label>
+    <label class="f">Height (tiles)<input name="h" type="number" min="3" max="200" value="${Math.min(200, B.h)}" required></label></div>`,
+    [{ label: 'Cancel', value: null, novalidate: true }, { label: 'Create plan', cls: 'btn-primary', collect: (f) => Object.fromEntries(new FormData(f)) }]);
+  if (!v) return;
+  const region = { cx: +v.cx | 0, cy: +v.cy | 0, w: clamp(+v.w, 3, 200), h: clamp(+v.h, 3, 200) };
+  const r = gridToPlan(grid, region, catalog.buildings);
+  persistPlan(true);
+  plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave };
+  switchedPlan(true);
+  const odd = Object.entries(r.report.unmatched);
+  toast(`Imported ${fmt(r.report.buildings)} buildings and ${fmt(r.report.roads)} roads` + (odd.length ? ` (${odd.length} unknown building type(s) skipped)` : ''), 5000);
+  if (odd.length) console.warn('Map import: building types with no catalog entry', r.report.unmatched);
+}
+{
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json'; inp.id = 'mapImport'; inp.hidden = true;
+  document.body.appendChild(inp);
+  inp.addEventListener('change', async () => {
+    const f = inp.files[0]; inp.value = ''; if (!f) return;
+    let grid;
+    try { grid = readGrid(JSON.parse(await f.text())); } catch (err) { alert('Map import failed: ' + err.message); return; }
+    gameMapDialog(grid, f.name);
+  });
+}
+
 // ----- import / export / share
 function bundle(all) {
   persistPlan(true);
@@ -1082,7 +1177,7 @@ function helpDialog() {
     <p class="small">H pan · B build · T terrain · P pave · E erase · I inspect · R rect · F fit · Ctrl+Z / Ctrl+Y · Space+drag or right-drag to pan · Delete removes inspected building.</p>
     <h3>Phone ↔ desktop</h3>
     <p class="small">Plans save automatically on each device. To move one across, use <b>Copy share code</b> and paste it on the other device, or export/import a file.</p>
-    <p class="note">Data: Post Apo Tycoon community wiki (fandom). Unofficial fan tool.</p>`);
+    <p class="note">Data: read from Post Apo Tycoon ${esc(GAME_SOURCE.app_version)} (base values), community wiki as fallback. Unofficial fan tool.</p>`);
 }
 
 // =====================================================================
@@ -1096,6 +1191,7 @@ if (isMobile()) closePanel();
 if (plan.view) Object.assign(view, plan.view); else needFit = true;
 new ResizeObserver(resizeCanvas).observe(stage);
 resizeCanvas();
+loadIcons().then((src) => { if (src) { renderPalette(); draw(); } });
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});

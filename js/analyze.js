@@ -13,6 +13,13 @@ export function effRadius(b, settings) {
   return r;
 }
 
+// Max distance to Water/River for buildings with the 'nearWater2' rule (name kept for saved catalogs).
+// Better Farm Watering (upgrade 198) lets Big Farms be up to 6 tiles away.
+export function waterRange(b, settings) {
+  if (b.id === 'bigfarm' && settings.upgrades?.farmWatering) return 6;
+  return b.waterWithin || 2;
+}
+
 export function needsRoad(b, terrainId, settings) {
   if (!b || b.road === false || b.isRoad || b.isRail) return false;
   if (b.roadlessUpg && settings.upgrades?.roadless) return false;
@@ -71,6 +78,17 @@ export function analyze(plan, settings) {
     }
   }
 
+  // Iron mines reach a foundry directly (within 3) or through a chain of touching mines: in game, mines
+  // flagged can_connect_to_neighbour_mine pass the connection on (checked against a real save: 1,264 of 1,269 fit).
+  const ironOk = new Set();
+  {
+    const chain = (i) => { const b = cells.get(i)?.b; return !!b && (b.mineLink || b.rules?.includes('needFoundry3')); };
+    const q = list.filter(i => (cells.get(i).b.rules?.includes('needFoundry3') && anyAround(i, 3, j => Bd(j)?.foundry))
+      || (cells.get(i).b.mineLink && anyAround(i, 1, j => Bd(j)?.foundry)));
+    q.forEach(i => ironOk.add(i));
+    while (q.length) { const i = q.pop(); around(i, 1, j => { if (!ironOk.has(j) && cells.has(j) && chain(j)) { ironOk.add(j); q.push(j); } }); }
+  }
+
   // ----- pass 1: per-building checks
   for (const i of list) {
     const c = cells.get(i); const b = c.b; const t = T(i);
@@ -90,11 +108,13 @@ export function analyze(plan, settings) {
     }
     for (const rule of b.rules || []) {
       switch (rule) {
-        case 'nearWater2':
-          if (!anyAround(i, 2, j => T(j)?.water)) add(i, 'bad', `${b.name} must be within 2 tiles of Water or River`);
+        case 'nearWater2': {
+          const wr = waterRange(b, settings);
+          if (!anyAround(i, wr, j => T(j)?.water)) add(i, 'bad', `${b.name} must be within ${wr} tile${wr === 1 ? '' : 's'} of Water or River`);
           break;
+        }
         case 'needFoundry3':
-          if (!anyAround(i, 3, j => Bd(j)?.foundry)) add(i, 'bad', `${b.name} needs a Foundry within 3 tiles`);
+          if (!ironOk.has(i)) add(i, 'bad', `${b.name} needs a Foundry within 3 tiles (or a touching mine that has one)`);
           break;
         case 'adjStoneMine':
           if (!anyAround(i, 1, j => /stone_mine$/.test(bld[j] || '') && bld[j] !== 'sea_stone_mine')) add(i, 'warn', `${b.name} has no adjacent Stone Mine`);

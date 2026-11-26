@@ -19,7 +19,8 @@ createServer(async (req, res) => {
     let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     if (p.endsWith('/')) p += 'index.html';
     const file = normalize(join(root, p));
-    if (!file.startsWith(root) || /[\\/](\.git|node_modules|tools)[\\/]/.test(file)) { res.writeHead(403).end(); return; }
+    // re/ holds raw game files and your private account export: never serve it (this server is reachable on your Wi-Fi).
+    if (!file.startsWith(root) || /^[\\/](\.git|\.claude|node_modules|tools|re)([\\/]|$)/.test(file.slice(root.length))) { res.writeHead(403).end(); return; }
     const body = await readFile(file);
     res.writeHead(200, { 'Content-Type': types[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     res.end(body);

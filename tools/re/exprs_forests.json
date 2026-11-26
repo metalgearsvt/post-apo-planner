@@ -1,0 +1,3 @@
+{
+  "FORESTS": "[1,2,3,4,5,6].map(t => ({ type: t, name: GetForestName(t), level: FOREST_LEVEL_REQS[t], cost: GetGrowForestCost({}, t), income: GetForestIncome(t), pollution: GetForestPollution(t) }))"
+}

@@ -1,0 +1,186 @@
+{
+ "source": {
+  "game": "Post Apo Tycoon (studio.powerplay.tycoonwrapper)",
+  "app_version": "1.0.67",
+  "bundle": "bundle-cb02d18ace.js",
+  "extracted": "2026-11-26",
+  "method": "Read from the running game (guest save, no upgrades) via the WebView DevTools protocol. See tools/re/README.md.",
+  "notes": [
+   "Values are BASE values with zero upgrades.",
+   "level null = not unlocked by town level (shop, event or story only).",
+   "Resource keys follow the planner: rocks -> stone, uranium_battery -> uranium.",
+   "income is per 9-second tick unless noted."
+  ]
+ },
+ "count": 44,
+ "data": [
+  {
+   "key": "grass",
+   "id": 1,
+   "ignore_pathing": true
+  },
+  {
+   "key": "desert",
+   "id": 2
+  },
+  {
+   "key": "sand",
+   "id": 3
+  },
+  {
+   "key": "mountain",
+   "id": 4
+  },
+  {
+   "key": "hill",
+   "id": 5
+  },
+  {
+   "key": "golden_field",
+   "id": 5
+  },
+  {
+   "key": "golden_island",
+   "id": 5
+  },
+  {
+   "key": "copper_field",
+   "id": 5
+  },
+  {
+   "key": "gem_field",
+   "id": 5
+  },
+  {
+   "key": "uranium_field",
+   "id": 5
+  },
+  {
+   "key": "uranium_barrel",
+   "id": 5
+  },
+  {
+   "key": "ground_oil",
+   "id": 5
+  },
+  {
+   "key": "rift",
+   "id": 5
+  },
+  {
+   "key": "rift_big",
+   "id": 5
+  },
+  {
+   "key": "airplane_wreck",
+   "id": 5
+  },
+  {
+   "key": "scorched",
+   "id": 5
+  },
+  {
+   "key": "thermal",
+   "id": 5
+  },
+  {
+   "key": "swamp_rocks",
+   "id": 5
+  },
+  {
+   "key": "swamp",
+   "id": 5
+  },
+  {
+   "key": "lava_rift",
+   "id": 5
+  },
+  {
+   "key": "rubble1",
+   "id": 5,
+   "pattern_fill": "rubble4"
+  },
+  {
+   "key": "rubble2",
+   "id": 5,
+   "pattern_fill": "rubble4"
+  },
+  {
+   "key": "rubble3",
+   "id": 5,
+   "pattern_fill": "rubble4"
+  },
+  {
+   "key": "rubble4",
+   "id": 5
+  },
+  {
+   "key": "broken_city_small",
+   "id": 5
+  },
+  {
+   "key": "broken_city_medium",
+   "id": 5
+  },
+  {
+   "key": "broken_city_big",
+   "id": 5
+  },
+  {
+   "key": "broken_city_big_train",
+   "id": 5
+  },
+  {
+   "key": "broken_power"
+  },
+  {
+   "key": "broken_rail"
+  },
+  {
+   "key": "disrupted_earth",
+   "image2": "disrupted_earth2"
+  },
+  {
+   "key": "asteroid_2c"
+  },
+  {
+   "key": "asteroid_3c"
+  },
+  {
+   "key": "asteroid_3g"
+  },
+  {
+   "key": "asteroid_2g"
+  },
+  {
+   "key": "asteroid_1"
+  },
+  {
+   "key": "asteroid_2"
+  },
+  {
+   "key": "asteroid_3"
+  },
+  {
+   "key": "titan"
+  },
+  {
+   "key": "titan_flat"
+  },
+  {
+   "key": "spoiled_forest"
+  },
+  {
+   "key": "smog_vent"
+  },
+  {
+   "key": "mud"
+  },
+  {
+   "key": "metal_tower",
+   "image2": "metal_tower_awakened",
+   "odrezok": "metal_tower",
+   "odrezok_apo": "metal_tower_apo"
+  }
+ ]
+}

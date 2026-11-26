@@ -1,0 +1,4 @@
+{
+  "ROADS": "[1,2,3,4,5,6,7,8].map(t => ({ type: t, name: GetRoadName(t), level_req_fn: typeof HasStreetType, cost_plain: GetStreetCost({}, t), cost_river: GetStreetCost({river:1}, t), cost_water: GetStreetCost({water:1}, t), cost_forest_extra_gold: LUMBER_CUT_COST, income: GetRoadIncomeByType(t), pollution: GetRoadPollutionByType(t), building_id: ROADS_B_ID[t] }))",
+  "FIRST_XY_TITANIUM_ROADS": "FIRST_XY_TITANIUM_ROADS"
+}

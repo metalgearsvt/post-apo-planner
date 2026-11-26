@@ -9,13 +9,18 @@ home screen, and works offline. There's no build step — plain HTML/CSS/JS.
 ## Features
 
 - **Configurable grid** (3–200 tiles per side), resize with anchoring, multiple saved plans.
-- **Preloaded catalog** of ~110 buildings and ~30 terrain tiles from the community wiki
-  (level, cost, power, pollution, income, allowed tiles, radius).
+- **Preloaded catalog** of 165 buildings, roads and forests and ~40 terrain tiles, read from the game itself
+  (level, cost, power, pollution, income, storage, allowed tiles, radius), with the community wiki as a fallback.
 - **Placement checks**: wrong tile type, Coal Plant within 2 of water, Iron Mine needs a Foundry within 3,
   Lumber Mill needs Forest in range, overlapping farms, road connection to a settlement, and more.
 - **Calculations**: net power and pollution, income per 9 s / per hour, total build cost, farm fields,
   pavement bonuses, Stone Conveyor and Tanker boosts, upgrade toggles (Big Farms, Advanced Saw, and others).
 - **Catalog editor**: fix numbers the wiki is missing, or add custom buildings and tiles.
+- **Game icons (optional, local only)**: build an icon pack from your own copy of the game and the planner draws
+  real building and terrain art. No game art is included in this repository or the hosted app.
+  Menu → Game icons… also exports a pack file you can import on your phone.
+- **Import your game map**: Menu → Import game map… turns a map exported from the game into a plan
+  (up to 200 × 200 tiles around any point, buildings, roads, rails and pavement included).
 - **Phone ↔ desktop**: share codes (copy/paste text) or export/import JSON files.
 - Touch: pinch to zoom, drag to paint, a Pan tool for one-finger moving. Desktop: wheel zoom and keyboard shortcuts.
 
@@ -45,18 +50,33 @@ exported files to move them between devices.
 ```
 index.html            app shell
 css/style.css         styles (desktop sidebar, mobile bottom sheet)
-js/data.js            terrain + building data (edit here to change defaults)
+js/data.js            merged catalog: game data over the wiki fallback (+ categories, resources)
+js/gamedata.js        GENERATED from data/game/ by tools/re/build_catalog.mjs
+js/data_wiki.js       wiki catalog: fallback values, planner rules and notes (planner ids live here)
 js/catalog.js         merges defaults with user edits
+js/icons.js           optional game icons (local folder or imported pack)
+js/gamemap.js         converts an exported game map into a plan
 js/analyze.js         placement rules and totals
 js/app.js             canvas rendering, input, UI, dialogs
 sw.js                 offline cache
 tools/serve.mjs       local server (LAN-accessible)
 tools/make-icons.mjs  regenerates PNG icons
+tools/re/             game data extraction + catalog generator (see tools/re/README.md)
+data/game/            data mined from the game (JSON) + WIKI_DIFF.md
 ```
 
 ## Data & assumptions
 
-Data comes from the Post Apo Tycoon fandom wiki (Module:Data/Buildings and building pages),
-gathered in November 2026. Values are base values before upgrades. Gathering radius is treated as a square
-around the building. Entries in the **Unverified** category come from the wiki's "pending" list.
-Anything wrong can be corrected in the in-app Catalog editor.
+Numbers come from the game itself: Post Apo Tycoon 1.0.67, read from a running copy of the game
+(see [data/game/README.md](data/game/README.md)). They are **base values with no upgrades**. For every
+field the game value wins. The wiki value (fandom wiki, November 2026, in `js/data_wiki.js`) is only used
+where the game data has nothing for that field, mostly per-tile production the game calculates on the fly
+(stone, lumber, chip, oil and super factory output). The Inspect panel's **Data** row shows which fields still
+come from the wiki. Gathering radius is treated as a square around the building. Anything can still be
+corrected in the in-app Catalog editor.
+
+After re-extracting game data, regenerate the catalog:
+
+```powershell
+node tools/re/normalize.mjs; node tools/re/build_catalog.mjs; node tools/re/compare_wiki.mjs
+```

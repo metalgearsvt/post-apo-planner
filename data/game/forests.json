@@ -1,0 +1,98 @@
+{
+ "source": {
+  "game": "Post Apo Tycoon (studio.powerplay.tycoonwrapper)",
+  "app_version": "1.0.67",
+  "bundle": "bundle-cb02d18ace.js",
+  "extracted": "2026-11-26",
+  "method": "Read from the running game (guest save, no upgrades) via the WebView DevTools protocol. See tools/re/README.md.",
+  "notes": [
+   "Values are BASE values with zero upgrades.",
+   "level null = not unlocked by town level (shop, event or story only).",
+   "Resource keys follow the planner: rocks -> stone, uranium_battery -> uranium.",
+   "income is per 9-second tick unless noted."
+  ]
+ },
+ "count": 6,
+ "data": [
+  {
+   "type": 1,
+   "key": "forest_1_notsaved",
+   "name": "Small Forest",
+   "level": 0,
+   "cost": {
+    "gold": 150
+   },
+   "income": {
+    "gold": 1
+   },
+   "pollution": -1
+  },
+  {
+   "type": 2,
+   "key": "forest_2_notsaved",
+   "name": "Dense Forest",
+   "level": 11,
+   "cost": {
+    "gold": 8500
+   },
+   "income": {
+    "gold": 2
+   },
+   "pollution": -2
+  },
+  {
+   "type": 3,
+   "key": "forest_3_notsaved",
+   "name": "Deep Forest",
+   "level": 51,
+   "cost": {
+    "gold": 140000
+   },
+   "income": {
+    "gold": 4
+   },
+   "pollution": -3
+  },
+  {
+   "type": 4,
+   "key": "tree4",
+   "name": "Thick Forest",
+   "level": 92,
+   "cost": {
+    "gold": 7000000
+   },
+   "income": {
+    "gold": 6
+   },
+   "pollution": -4
+  },
+  {
+   "type": 5,
+   "key": "tree5",
+   "name": "Tall Forest",
+   "level": 206,
+   "cost": {
+    "gold": 5000000,
+    "red_chips": 10000
+   },
+   "income": {
+    "gold": 7
+   },
+   "pollution": -5
+  },
+  {
+   "type": 6,
+   "key": "tree6",
+   "name": "Lush Tall Forest",
+   "level": 250,
+   "cost": {
+    "gold": 12000000,
+    "red_chips": 100000
+   },
+   "income": {
+    "gold": 8
+   },
+   "pollution": -6
+  }
+ ]
+}

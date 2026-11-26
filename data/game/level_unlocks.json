@@ -1,0 +1,362 @@
+{
+ "source": {
+  "game": "Post Apo Tycoon (studio.powerplay.tycoonwrapper)",
+  "app_version": "1.0.67",
+  "bundle": "bundle-cb02d18ace.js",
+  "extracted": "2026-11-26",
+  "method": "Read from the running game (guest save, no upgrades) via the WebView DevTools protocol. See tools/re/README.md.",
+  "notes": [
+   "Values are BASE values with zero upgrades.",
+   "level null = not unlocked by town level (shop, event or story only).",
+   "Resource keys follow the planner: rocks -> stone, uranium_battery -> uranium.",
+   "income is per 9-second tick unless noted."
+  ]
+ },
+ "count": 86,
+ "data": [
+  {
+   "key": "ROCK_MINE_BOOST_2_RANGE",
+   "level": 2
+  },
+  {
+   "key": "SCOUT_TOWER_LEVEL_REQ",
+   "level": 3
+  },
+  {
+   "key": "QUICK_TOOL_LEVEL",
+   "level": 4
+  },
+  {
+   "key": "GOLDEN_MINE_LEVEL_REQ",
+   "level": 5
+  },
+  {
+   "key": "ROCK_MINE_BOOST_2_MULTIPLIER",
+   "level": 5
+  },
+  {
+   "key": "FARM_REQURED_LEVEL",
+   "level": 6
+  },
+  {
+   "key": "CLEAR_RUBBLE_LEVEL_REQ",
+   "level": 7
+  },
+  {
+   "key": "LUMBER_REQ_LEVEL",
+   "level": 8
+  },
+  {
+   "key": "REVITALISE_REQURED_LEVEL",
+   "level": 9
+  },
+  {
+   "key": "SALVAGE_LEVEL_REQ",
+   "level": 10
+  },
+  {
+   "key": "FOREST_2_LEVEL_REQ",
+   "level": 11
+  },
+  {
+   "key": "POLLUTION_LEVEL_REQUIREMENT",
+   "level": 12
+  },
+  {
+   "key": "ROCK_LEVEL_REQUIREMENT",
+   "level": 12
+  },
+  {
+   "key": "LUMBER_STORAGE_LEVEL_REQ",
+   "level": 14
+  },
+  {
+   "key": "SHIPYARD_LEVEL_REQ",
+   "level": 15
+  },
+  {
+   "key": "REQ_ELECTRICITY_LEVEL",
+   "level": 20
+  },
+  {
+   "key": "SEA_GENERATOR_LEVEL_REQ",
+   "level": 21
+  },
+  {
+   "key": "QUICK_TOOL_FOREST_UPGRADE",
+   "level": 23
+  },
+  {
+   "key": "URANIUM_CLEAN_LVL_REQ",
+   "level": 23
+  },
+  {
+   "key": "STEEL_LEVEL_REQ",
+   "level": 24
+  },
+  {
+   "key": "HEAVY_LUMBER_MILL_LEVEL_REQ",
+   "level": 25
+  },
+  {
+   "key": "STREET_LEVEL_REQ",
+   "level": 26
+  },
+  {
+   "key": "STORAGE_CONTAINER_LEVEL_REQ",
+   "level": 27
+  },
+  {
+   "key": "COPPER_LEVEL_REQ",
+   "level": 28
+  },
+  {
+   "key": "GEM_MINE_LEVEL_REQ",
+   "level": 30
+  },
+  {
+   "key": "ACTIVISTS_REQURED_LEVEL",
+   "level": 31
+  },
+  {
+   "key": "GOLD_MINE_2_LEVEL_REQ",
+   "level": 31
+  },
+  {
+   "key": "OIL_LEVEL_REQ",
+   "level": 32
+  },
+  {
+   "key": "DEEP_WATER_LVL_REQ",
+   "level": 33
+  },
+  {
+   "key": "QUALITY_STREET_LEVEL_REQ",
+   "level": 34
+  },
+  {
+   "key": "FLATEN_MOUNTAINS_LEVEL_REQ",
+   "level": 35
+  },
+  {
+   "key": "OIL_STORAGE_LEVEL_REQ",
+   "level": 36
+  },
+  {
+   "key": "INFRASTRUCTURE_LEVEL_REQUIRED",
+   "level": 37
+  },
+  {
+   "key": "HEAVY_SHIPYARD_LEVEL_REQUIRED",
+   "level": 38
+  },
+  {
+   "key": "WINDMILL_LEVEL_REQUIRED",
+   "level": 39
+  },
+  {
+   "key": "WATER_OIL_LEVEL_REQ",
+   "level": 40
+  },
+  {
+   "key": "SOLAR_PANEL_LEVEL_REQUIRED",
+   "level": 41
+  },
+  {
+   "key": "TANKERS_LEVEL_REQUIRED",
+   "level": 42
+  },
+  {
+   "key": "BIGFARMS_LEVEL_REQUIRED",
+   "level": 43
+  },
+  {
+   "key": "ROCK_MINE2_LEVEL_REQUIRED",
+   "level": 44
+  },
+  {
+   "key": "STORAGE_CRANE_LEVEL_REQ",
+   "level": 45
+  },
+  {
+   "key": "BIG_BRIDGES_LEVEL_REQUIRED",
+   "level": 46
+  },
+  {
+   "key": "TRAIN_STATION_LEVEL",
+   "level": 46
+  },
+  {
+   "key": "CHIP_FACTORY_STORAGE_UPGRADE_LEVEL",
+   "level": 47
+  },
+  {
+   "key": "HIGHLITE_LEVEL",
+   "level": 47
+  },
+  {
+   "key": "MOUNTAIN_HEALER_LEVEL",
+   "level": 47
+  },
+  {
+   "key": "ACTIVIST_HELP_LEVEL",
+   "level": 48
+  },
+  {
+   "key": "REMOVE_WATER_OIL_LEVEL",
+   "level": 48
+  },
+  {
+   "key": "WATER_GEM_HARVEST_LEVEL",
+   "level": 49
+  },
+  {
+   "key": "FOREST_3_LEVEL_REQ",
+   "level": 51
+  },
+  {
+   "key": "BIG_SHIP_LEVEL_REQ",
+   "level": 52
+  },
+  {
+   "key": "SOLAR_UPGRADE_LEVEL_REQ",
+   "level": 52
+  },
+  {
+   "key": "REMOVE_GROUND_OIL_LEVEL",
+   "level": 53
+  },
+  {
+   "key": "FOUNDRY_2_LEVEL_REQ",
+   "level": 54
+  },
+  {
+   "key": "PREMIUM_SEABED_LEVEL_REQ",
+   "level": 55
+  },
+  {
+   "key": "CHIP_FACTORY_2_LEVEL_REQ",
+   "level": 56
+  },
+  {
+   "key": "THERMAL_POWER_PLANT_LEVEL_REQ",
+   "level": 57
+  },
+  {
+   "key": "GOLD_MINE_3_LEVEL_REQ",
+   "level": 58
+  },
+  {
+   "key": "FILL_SEA_LEVEL_REQ",
+   "level": 59
+  },
+  {
+   "key": "PREMIUM_GOLD_MINE_2_LEVEL_REQ",
+   "level": 59
+  },
+  {
+   "key": "DIG_SEA_LEVEL_REQ",
+   "level": 61
+  },
+  {
+   "key": "SHIPYARD_STORAGE_LEVEL_REQ",
+   "level": 61
+  },
+  {
+   "key": "ROAD_TYPE_5_LEVEL_REQ",
+   "level": 62
+  },
+  {
+   "key": "RIVER_TREES_LEVEL_REQ",
+   "level": 63
+  },
+  {
+   "key": "CLEAR_THERMAL_TILES_LEVEL_REQ",
+   "level": 64
+  },
+  {
+   "key": "SUPER_FACTORY_LEVEL_REQ",
+   "level": 65
+  },
+  {
+   "key": "REVITALISE_SCORCHED_REQURED_LEVEL",
+   "level": 67
+  },
+  {
+   "key": "PREMIUM_STORAGE_2_LEVEL_REQ",
+   "level": 68
+  },
+  {
+   "key": "REVITALISE_LAVA_RIFT_REQURED_LEVEL",
+   "level": 74
+  },
+  {
+   "key": "URANIUM_REFINERY_LVL_REQ",
+   "level": 75
+  },
+  {
+   "key": "ROCK_WATER_MINE_LVL_REQ",
+   "level": 76
+  },
+  {
+   "key": "URANIUM_STORAGE_LVL_REQ",
+   "level": 77
+  },
+  {
+   "key": "URANIUM_BOMB_LVL_REQ",
+   "level": 78
+  },
+  {
+   "key": "REVITALISE_LAVA_TO_THERMAL_LVL_REQ",
+   "level": 80
+  },
+  {
+   "key": "ROAD_TYPE_6_LEVEL_REQ",
+   "level": 89
+  },
+  {
+   "key": "FOREST_4_LEVEL_REQ",
+   "level": 92
+  },
+  {
+   "key": "ECO_FOUNDRY_LEVEL_REQ",
+   "level": 95
+  },
+  {
+   "key": "URANIUM_POWER_PLANT_LEVEL_REQ",
+   "level": 97
+  },
+  {
+   "key": "SUBURB_LEVEL_REQUIRED",
+   "level": 114
+  },
+  {
+   "key": "URANIUM_RIFT_LEVEL_REQ",
+   "level": 116
+  },
+  {
+   "key": "LUMBER_DRONE_LEVEL_REQ",
+   "level": 118
+  },
+  {
+   "key": "STONE_CONVEYOR_2_LEVEL",
+   "level": 121
+  },
+  {
+   "key": "ROAD_TYPE_7_LEVEL_REQ",
+   "level": 177
+  },
+  {
+   "key": "FOREST_5_LEVEL_REQ",
+   "level": 206
+  },
+  {
+   "key": "ROAD_TYPE_8_LEVEL_REQ",
+   "level": 218
+  },
+  {
+   "key": "FOREST_6_LEVEL_REQ",
+   "level": 250
+  }
+ ]
+}

@@ -1,0 +1,3522 @@
+{
+ "source": {
+  "game": "Post Apo Tycoon (studio.powerplay.tycoonwrapper)",
+  "app_version": "1.0.67",
+  "bundle": "bundle-cb02d18ace.js",
+  "extracted": "2026-11-26",
+  "method": "Read from the running game (guest save, no upgrades) via the WebView DevTools protocol. See tools/re/README.md.",
+  "notes": [
+   "Values are BASE values with zero upgrades.",
+   "level null = not unlocked by town level (shop, event or story only).",
+   "Resource keys follow the planner: rocks -> stone, uranium_battery -> uranium.",
+   "income is per 9-second tick unless noted."
+  ]
+ },
+ "count": 72,
+ "data": [
+  {
+   "key": "sell_toy_cytrium_notsaved",
+   "id": 191,
+   "name": "Indestructo-Marbles",
+   "category": [],
+   "level": 45,
+   "unlock": "event",
+   "event_type": 7,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "toy_factory"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Indestructo-Marbles",
+    "id": 191,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sell_toy_cytrium_notsaved",
+    "only_specific_tiles": [
+     "toy_factory"
+    ],
+    "ignore_buildings": [
+     "toy_factory"
+    ],
+    "event_type": 7,
+    "required_level": 45,
+    "is_action": 1,
+    "hidden_in_levelup": 1,
+    "on_top": 1
+   }
+  },
+  {
+   "key": "sell_toy_uranium_notsaved",
+   "id": 190,
+   "name": "Cool Glowing Figure",
+   "category": [],
+   "level": 76,
+   "unlock": "event",
+   "event_type": 7,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "toy_factory"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Cool Glowing Figure",
+    "id": 190,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sell_toy_uranium_notsaved",
+    "only_specific_tiles": [
+     "toy_factory"
+    ],
+    "ignore_buildings": [
+     "toy_factory"
+    ],
+    "event_type": 7,
+    "required_level": 76,
+    "is_action": 1,
+    "hidden_in_levelup": 1,
+    "on_top": 1
+   }
+  },
+  {
+   "key": "sell_toy_oil_notsaved",
+   "id": 189,
+   "name": "Plastic Ball",
+   "category": [],
+   "level": 32,
+   "unlock": "event",
+   "event_type": 7,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "toy_factory"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Plastic Ball",
+    "id": 189,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sell_toy_oil_notsaved",
+    "only_specific_tiles": [
+     "toy_factory"
+    ],
+    "ignore_buildings": [
+     "toy_factory"
+    ],
+    "event_type": 7,
+    "required_level": 32,
+    "is_action": 1,
+    "max_level": 115,
+    "hidden_in_levelup": 1,
+    "on_top": 1
+   }
+  },
+  {
+   "key": "sell_toy_chips_notsaved",
+   "id": 188,
+   "name": "Handheld Console",
+   "category": [],
+   "level": 28,
+   "unlock": "event",
+   "event_type": 7,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "toy_factory"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Handheld Console",
+    "id": 188,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sell_toy_chips_notsaved",
+    "only_specific_tiles": [
+     "toy_factory"
+    ],
+    "ignore_buildings": [
+     "toy_factory"
+    ],
+    "event_type": 7,
+    "required_level": 28,
+    "is_action": 1,
+    "hidden_in_levelup": 1,
+    "on_top": 1
+   }
+  },
+  {
+   "key": "sell_toy_steel_notsaved",
+   "id": 187,
+   "name": "Toy Rocket",
+   "category": [],
+   "level": 24,
+   "unlock": "event",
+   "event_type": 7,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "toy_factory"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Toy Rocket",
+    "id": 187,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sell_toy_steel_notsaved",
+    "only_specific_tiles": [
+     "toy_factory"
+    ],
+    "ignore_buildings": [
+     "toy_factory"
+    ],
+    "event_type": 7,
+    "required_level": 24,
+    "is_action": 1,
+    "hidden_in_levelup": 1,
+    "on_top": 1
+   }
+  },
+  {
+   "key": "sell_toy_rocks_notsaved",
+   "id": 186,
+   "name": "Rocky Blocks",
+   "category": [],
+   "level": 60,
+   "unlock": "event",
+   "event_type": 7,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "toy_factory"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Rocky Blocks",
+    "id": 186,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sell_toy_rocks_notsaved",
+    "only_specific_tiles": [
+     "toy_factory"
+    ],
+    "ignore_buildings": [
+     "toy_factory"
+    ],
+    "event_type": 7,
+    "required_level": 60,
+    "is_action": 1,
+    "hidden_in_levelup": 1,
+    "on_top": 1
+   }
+  },
+  {
+   "key": "sell_toy_lumber_notsaved",
+   "id": 185,
+   "name": "Wooden Train",
+   "category": [],
+   "level": 60,
+   "unlock": "event",
+   "event_type": 7,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "toy_factory"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Wooden Train",
+    "id": 185,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sell_toy_lumber_notsaved",
+    "only_specific_tiles": [
+     "toy_factory"
+    ],
+    "ignore_buildings": [
+     "toy_factory"
+    ],
+    "event_type": 7,
+    "required_level": 60,
+    "is_action": 1,
+    "hidden_in_levelup": 1,
+    "on_top": 1
+   }
+  },
+  {
+   "key": "sell_toy_food_notsaved",
+   "id": 184,
+   "name": "Ginger Bread",
+   "category": [],
+   "level": 60,
+   "unlock": "event",
+   "event_type": 7,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "toy_factory"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Ginger Bread",
+    "id": 184,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sell_toy_food_notsaved",
+    "only_specific_tiles": [
+     "toy_factory"
+    ],
+    "ignore_buildings": [
+     "toy_factory"
+    ],
+    "event_type": 7,
+    "required_level": 60,
+    "is_action": 1,
+    "hidden_in_levelup": 1,
+    "on_top": 1
+   }
+  },
+  {
+   "key": "build_mega_city_notsaved",
+   "id": 165,
+   "name": "Mega-city",
+   "category": [],
+   "level": 139,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 750000000000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "mesto"
+    ],
+    "forbidden": [
+     "mega_city",
+     "vidiek"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Mega-city",
+    "id": 165,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "build_mega_city_notsaved",
+    "only_specific_tiles": [
+     "mesto"
+    ],
+    "forbidden_tiles": [
+     "mega_city",
+     "vidiek"
+    ],
+    "cost": {
+     "gold": 750000000000
+    },
+    "works_even_with_building": 1,
+    "display_even_if_has_street": 1,
+    "required_level": 139,
+    "on_top": 1,
+    "hidden_in_filter": 1,
+    "is_terrain_modifier": 3
+   }
+  },
+  {
+   "key": "eco_city_2_notsaved",
+   "id": 237,
+   "name": "Super Eco City",
+   "category": [],
+   "level": 220,
+   "unlock": "level",
+   "event_type": null,
+   "premium": true,
+   "cost": {
+    "gems": 900
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "mesto"
+    ],
+    "forbidden": [
+     "mega_city",
+     "vidiek",
+     "eco_city_2"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Super Eco City",
+    "id": 237,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "eco_city_2_notsaved",
+    "only_specific_tiles": [
+     "mesto"
+    ],
+    "forbidden_tiles": [
+     "mega_city",
+     "vidiek",
+     "eco_city_2"
+    ],
+    "cost": {
+     "gems": 900
+    },
+    "never_preview_as_offer": true,
+    "works_even_with_building": 1,
+    "display_even_if_has_street": 1,
+    "required_level": 220,
+    "on_top": 1,
+    "is_terrain_modifier": 3,
+    "can_put_into_storage": true
+   }
+  },
+  {
+   "key": "eco_city_notsaved",
+   "id": 137,
+   "name": "Eco City",
+   "category": [],
+   "level": 135,
+   "unlock": "level",
+   "event_type": null,
+   "premium": true,
+   "cost": {
+    "gems": 400
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "mesto"
+    ],
+    "forbidden": [
+     "mega_city",
+     "vidiek",
+     "eco_city",
+     "eco_city_2"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Eco City",
+    "id": 137,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "eco_city_notsaved",
+    "only_specific_tiles": [
+     "mesto"
+    ],
+    "forbidden_tiles": [
+     "mega_city",
+     "vidiek",
+     "eco_city",
+     "eco_city_2"
+    ],
+    "cost": {
+     "gems": 400
+    },
+    "never_preview_as_offer": true,
+    "works_even_with_building": 1,
+    "display_even_if_has_street": 1,
+    "required_level": 135,
+    "on_top": 1,
+    "is_terrain_modifier": 3,
+    "can_put_into_storage": true
+   }
+  },
+  {
+   "key": "manage_trains_notsaved",
+   "id": 90,
+   "name": "Manage Trains",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "is_train_station"
+    ]
+   },
+   "rules": {},
+   "description": "Set up your trains here.",
+   "raw": {
+    "name": "Manage Trains",
+    "id": 90,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "manage_trains_notsaved",
+    "description": "Set up your trains here.",
+    "only_specific_tiles": [
+     "is_train_station"
+    ],
+    "works_even_with_building": 1,
+    "required_level": 0,
+    "hidden_in_levelup": 1,
+    "no_recalculations": 1,
+    "on_top": true
+   }
+  },
+  {
+   "key": "lumber_cut_notsaved",
+   "id": 217,
+   "name": "Chop chop",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 6,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 0
+   },
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Chop chop",
+    "id": 217,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "lumber_cut_notsaved",
+    "description": "",
+    "cost": {
+     "gold": 0
+    },
+    "destroy_gold_cost": 500,
+    "required_level": 6,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "forest_1_notsaved",
+   "id": 214,
+   "name": "Small Forest",
+   "category": [
+    "Nature"
+   ],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Small Forest",
+    "id": 214,
+    "categories": [
+     8
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "forest_1_notsaved",
+    "isBasicForest": 1,
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "required_level": 0,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "forest_2_notsaved",
+   "id": 215,
+   "name": "Dense Forest",
+   "category": [
+    "Nature"
+   ],
+   "level": 11,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Dense Forest",
+    "id": 215,
+    "categories": [
+     8
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "forest_2_notsaved",
+    "isBasicForest": 2,
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "has_quick_tool": 1,
+    "required_level": 11,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "forest_3_notsaved",
+   "id": 216,
+   "name": "Deep Forest",
+   "category": [
+    "Nature"
+   ],
+   "level": 51,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Deep Forest",
+    "id": 216,
+    "categories": [
+     8
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "forest_3_notsaved",
+    "isBasicForest": 3,
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "has_quick_tool": 1,
+    "required_level": 51,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "road_1_notsaved",
+   "id": 218,
+   "name": "Dirt Road",
+   "category": [
+    "Transport"
+   ],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Dirt Road",
+    "id": 218,
+    "categories": [
+     9
+    ],
+    "tile_categories": [
+     101
+    ],
+    "required_level": 0,
+    "grid_key": "road_1_notsaved",
+    "show_tile_in_build_grid": "grass",
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "road_2_notsaved",
+   "id": 219,
+   "name": "Paved Road",
+   "category": [
+    "Transport"
+   ],
+   "level": 12,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Paved Road",
+    "id": 219,
+    "categories": [
+     9
+    ],
+    "tile_categories": [
+     101
+    ],
+    "required_level": 12,
+    "grid_key": "road_2_notsaved",
+    "show_tile_in_build_grid": "grass",
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "road_3_notsaved",
+   "id": 220,
+   "name": "Basic Road",
+   "category": [
+    "Transport"
+   ],
+   "level": 26,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Basic Road",
+    "id": 220,
+    "categories": [
+     9
+    ],
+    "tile_categories": [
+     101
+    ],
+    "required_level": 26,
+    "grid_key": "road_3_notsaved",
+    "show_tile_in_build_grid": "grass",
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "road_4_notsaved",
+   "id": 221,
+   "name": "Street Road",
+   "category": [
+    "Transport"
+   ],
+   "level": 34,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Street Road",
+    "id": 221,
+    "categories": [
+     9
+    ],
+    "tile_categories": [
+     101
+    ],
+    "required_level": 34,
+    "grid_key": "road_4_notsaved",
+    "show_tile_in_build_grid": "grass",
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "road_5_notsaved",
+   "id": 222,
+   "name": "Fast Street",
+   "category": [
+    "Transport"
+   ],
+   "level": 62,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Fast Street",
+    "id": 222,
+    "categories": [
+     9
+    ],
+    "tile_categories": [
+     101
+    ],
+    "required_level": 62,
+    "grid_key": "road_5_notsaved",
+    "show_tile_in_build_grid": "grass",
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "road_6_notsaved",
+   "id": 223,
+   "name": "Eco Road",
+   "category": [
+    "Transport"
+   ],
+   "level": 89,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Eco Road",
+    "id": 223,
+    "categories": [
+     9
+    ],
+    "tile_categories": [
+     101
+    ],
+    "required_level": 89,
+    "grid_key": "road_6_notsaved",
+    "show_tile_in_build_grid": "grass",
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "road_7_notsaved",
+   "id": 224,
+   "name": "Eco Highway",
+   "category": [
+    "Transport"
+   ],
+   "level": 177,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Eco Highway",
+    "id": 224,
+    "categories": [
+     9
+    ],
+    "tile_categories": [
+     101
+    ],
+    "required_level": 177,
+    "grid_key": "road_7_notsaved",
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "road_8_notsaved",
+   "id": 245,
+   "name": "Super Highway",
+   "category": [
+    "Transport"
+   ],
+   "level": null,
+   "unlock": "shop/story",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "destroy_cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ]
+   },
+   "rules": {},
+   "description": "",
+   "raw": {
+    "name": "Super Highway",
+    "id": 245,
+    "categories": [
+     9
+    ],
+    "tile_categories": [
+     101
+    ],
+    "required_level": 9999,
+    "grid_key": "road_8_notsaved",
+    "description": "",
+    "cost": {
+     "gold": 1
+    },
+    "destroy_gold_cost": 500,
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "feedthefish_notsaved",
+   "id": 40,
+   "name": "Premium Fish",
+   "category": [
+    "Special"
+   ],
+   "level": 35,
+   "unlock": "level",
+   "event_type": null,
+   "premium": true,
+   "cost": {
+    "gems": 40
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Water"
+    ],
+    "only": [
+     "fish_small+deep_water",
+     "fish_small+deep_water2"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Premium Fish",
+    "id": 40,
+    "categories": [
+     3
+    ],
+    "tile_categories": [
+     102
+    ],
+    "grid_key": "feedthefish_notsaved",
+    "only_specific_tiles": [
+     "fish_small+deep_water",
+     "fish_small+deep_water2"
+    ],
+    "cost": {
+     "gems": 40
+    },
+    "no_water_pavement": true,
+    "has_quick_tool": 1,
+    "show_tile_in_build_grid": "water",
+    "big_fish_placement_is_ok": true,
+    "required_level": 35,
+    "is_terrain_modifier": 1,
+    "display_even_if_has_street": 1,
+    "works_even_with_building": 1,
+    "has_size_tool": 1,
+    "can_use_with_ship": 1,
+    "big_recalculations": true,
+    "can_put_into_storage": true
+   }
+  },
+  {
+   "key": "revitalise_notsaved",
+   "id": 38,
+   "name": "Revitalise",
+   "category": [],
+   "level": 9,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "desert",
+     "sand"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Revitalise",
+    "id": 38,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "revitalise_notsaved",
+    "only_specific_tiles": [
+     "desert",
+     "sand"
+    ],
+    "eco_tokens_for_this_action": 150,
+    "display_even_if_has_street": true,
+    "has_quick_tool": 1,
+    "works_even_with_building": 1,
+    "required_level": 9,
+    "show_even_if_level_not_met": true,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "flat_mountain_notsaved",
+   "id": 36,
+   "name": "Raze Mountain",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 35,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 400000,
+    "oil": 30000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "mountain"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Raze Mountain",
+    "id": 36,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "flat_mountain_notsaved",
+    "only_specific_tiles": [
+     "mountain"
+    ],
+    "cost": {
+     "gold": 400000,
+     "oil": 30000
+    },
+    "show_tile_in_build_grid": "mountains",
+    "has_quick_tool": 1,
+    "required_level": 35,
+    "has_size_tool": 1,
+    "confirmation_required": true,
+    "confirmation_skipped_after_level": 101,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "remove_rubble_notsaved",
+   "id": 49,
+   "name": "Remove rubble",
+   "category": [],
+   "level": 7,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 13000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "rubble1",
+     "rubble2",
+     "rubble3",
+     "rubble4"
+    ]
+   },
+   "rules": {},
+   "description": "remove the rubble so you can plant forests here.",
+   "raw": {
+    "name": "Remove rubble",
+    "id": 49,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "remove_rubble_notsaved",
+    "required_level": 7,
+    "description": "remove the rubble so you can plant forests here.",
+    "only_specific_tiles": [
+     "rubble1",
+     "rubble2",
+     "rubble3",
+     "rubble4"
+    ],
+    "cost": {
+     "gold": 13000
+    },
+    "has_quick_tool": 1,
+    "works_even_with_building": 1,
+    "eco_tokens_for_this_action": 250,
+    "display_even_if_has_street": 1,
+    "show_even_if_level_not_met": true,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "deep_water_notsaved",
+   "id": 51,
+   "name": "Ocean Sweep",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 33,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": 0,
+   "pollution": -2,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Water"
+    ],
+    "only": [
+     "water"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Ocean Sweep",
+    "id": 51,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     102
+    ],
+    "grid_key": "deep_water_notsaved",
+    "required_level": 33,
+    "only_specific_tiles": [
+     "water"
+    ],
+    "eco_tokens_for_this_action": 1000,
+    "ignore_buildings": [
+     "rails"
+    ],
+    "electricity": 0,
+    "polution": -2,
+    "big_fish_placement_is_ok": 1,
+    "display_even_if_has_street": 1,
+    "allowed_on_artifacts": 1,
+    "has_quick_tool": 1,
+    "has_size_tool": 1,
+    "is_terrain_modifier": 1,
+    "base_polution": -2
+   }
+  },
+  {
+   "key": "remove_broken_city_notsaved",
+   "id": 52,
+   "name": "Salvage",
+   "category": [],
+   "level": 10,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 175000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "broken_city_small",
+     "broken_city_medium",
+     "broken_city_big"
+    ]
+   },
+   "rules": {},
+   "description": "Run through this building and check for important stuff and then clear the tile.",
+   "raw": {
+    "name": "Salvage",
+    "id": 52,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "remove_broken_city_notsaved",
+    "required_level": 10,
+    "description": "Run through this building and check for important stuff and then clear the tile.",
+    "only_specific_tiles": [
+     "broken_city_small",
+     "broken_city_medium",
+     "broken_city_big"
+    ],
+    "cost": {
+     "gold": 175000
+    },
+    "has_quick_tool": 1,
+    "show_even_if_level_not_met": true,
+    "works_even_with_building": 1,
+    "eco_tokens_for_this_action": 750,
+    "is_terrain_modifier": 2
+   }
+  },
+  {
+   "key": "built_ground_oil_notsaved",
+   "id": 35,
+   "name": "Fill and pipe",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 37,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 1720000,
+    "clay": 24
+   },
+   "power": null,
+   "pollution": 5,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "rift"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Fill and pipe",
+    "id": 35,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     103
+    ],
+    "max_level": 116,
+    "grid_key": "built_ground_oil_notsaved",
+    "only_specific_tiles": [
+     "rift"
+    ],
+    "cost": {
+     "gold": 1720000,
+     "clay": 24
+    },
+    "polution": 5,
+    "required_level": 37,
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "base_polution": 5
+   }
+  },
+  {
+   "key": "destroy_uranium_barrel_notsaved",
+   "id": 55,
+   "name": "Destroy",
+   "category": [],
+   "level": 23,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "uranium_barrel",
+     "nuclear_plant_broken",
+     "blue_purifier_broken"
+    ]
+   },
+   "rules": {},
+   "description": "Destroy uranium barrel.",
+   "raw": {
+    "name": "Destroy",
+    "id": 55,
+    "categories": [],
+    "tile_categories": [],
+    "required_level": 23,
+    "grid_key": "destroy_uranium_barrel_notsaved",
+    "description": "Destroy uranium barrel.",
+    "only_specific_tiles": [
+     "uranium_barrel",
+     "nuclear_plant_broken",
+     "blue_purifier_broken"
+    ],
+    "show_even_if_level_not_met": true,
+    "has_quick_tool": 1,
+    "works_on_uranium": 1,
+    "works_even_with_building": 1,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "revitalise_scorched_notsaved",
+   "id": 56,
+   "name": "Revitalise",
+   "category": [],
+   "level": 67,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "scorched"
+    ]
+   },
+   "rules": {},
+   "description": "Turns a Scorched Earth tile to Plain.",
+   "raw": {
+    "name": "Revitalise",
+    "id": 56,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "revitalise_scorched_notsaved",
+    "description": "Turns a Scorched Earth tile to Plain.",
+    "only_specific_tiles": [
+     "scorched"
+    ],
+    "eco_tokens_for_this_action": 1200,
+    "has_quick_tool": 1,
+    "required_level": 67,
+    "show_even_if_level_not_met": true,
+    "display_even_if_has_street": 1,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "sensor_search_notsaved",
+   "id": 58,
+   "name": "Search",
+   "category": [],
+   "level": 28,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 1800000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "sensor_tower"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Search",
+    "id": 58,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sensor_search_notsaved",
+    "only_specific_tiles": [
+     "sensor_tower"
+    ],
+    "works_even_with_building": 1,
+    "cost": {
+     "gold": 1800000
+    },
+    "required_level": 28,
+    "no_recalculations": 1
+   }
+  },
+  {
+   "key": "sensor_highlight_notsaved",
+   "id": 59,
+   "name": "Highlight",
+   "category": [],
+   "level": 47,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "sensor_tower",
+     "radar"
+    ]
+   },
+   "rules": {},
+   "description": "You will highlite selected tile type or building in map",
+   "raw": {
+    "name": "Highlight",
+    "id": 59,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sensor_highlight_notsaved",
+    "description": "You will highlite selected tile type or building in map",
+    "only_specific_tiles": [
+     "sensor_tower",
+     "radar"
+    ],
+    "works_even_with_building": 1,
+    "required_level": 47,
+    "no_recalculations": 1
+   }
+  },
+  {
+   "key": "sensor_search3_notsaved",
+   "id": 81,
+   "name": "Buildings Overview",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "sensor_tower",
+     "radar"
+    ]
+   },
+   "rules": {},
+   "description": "Opens menu with extra building options",
+   "raw": {
+    "name": "Buildings Overview",
+    "id": 81,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "sensor_search3_notsaved",
+    "description": "Opens menu with extra building options",
+    "only_specific_tiles": [
+     "sensor_tower",
+     "radar"
+    ],
+    "works_even_with_building": 1,
+    "required_level": 0,
+    "no_recalculations": 1
+   }
+  },
+  {
+   "key": "remove_water_oil_notsaved",
+   "id": 60,
+   "name": "Remove Water Oil",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 48,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 2600000,
+    "oil": 175000,
+    "clay": 5
+   },
+   "power": null,
+   "pollution": -45,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Water"
+    ],
+    "only": [
+     "oil"
+    ]
+   },
+   "rules": {},
+   "description": "You will remove the oil and make the water clean. Medium Fish might appear",
+   "raw": {
+    "name": "Remove Water Oil",
+    "id": 60,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     102
+    ],
+    "grid_key": "remove_water_oil_notsaved",
+    "description": "You will remove the oil and make the water clean. Medium Fish might appear",
+    "only_specific_tiles": [
+     "oil"
+    ],
+    "show_tile_in_build_grid": [
+     "water",
+     "oil_water"
+    ],
+    "eco_tokens_for_this_action": 2000,
+    "works_on_bridges": 1,
+    "ignore_buildings": [
+     "rails"
+    ],
+    "display_even_if_has_street": true,
+    "polution": -45,
+    "cost": {
+     "gold": 2600000,
+     "oil": 175000,
+     "clay": 5
+    },
+    "has_quick_tool": 1,
+    "required_level": 48,
+    "is_terrain_modifier": 1,
+    "base_polution": -45
+   }
+  },
+  {
+   "key": "harvest_gem_notsaved",
+   "id": 61,
+   "name": "Harvest gems",
+   "category": [],
+   "level": 49,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "water_rocks_gem"
+    ]
+   },
+   "rules": {},
+   "description": "Harvest gems from gem water rocks",
+   "raw": {
+    "name": "Harvest gems",
+    "id": 61,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "harvest_gem_notsaved",
+    "required_level": 49,
+    "required_level_up": 49,
+    "description": "Harvest gems from gem water rocks",
+    "tease_from_level": 1,
+    "has_quick_tool": 1,
+    "only_specific_tiles": [
+     "water_rocks_gem"
+    ]
+   }
+  },
+  {
+   "key": "remove_ground_oil_notsaved",
+   "id": 67,
+   "name": "Remove Ground Oil",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 53,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 1500000,
+    "stone": 75000,
+    "steel": 40000
+   },
+   "power": null,
+   "pollution": -5,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "ground_oil"
+    ]
+   },
+   "rules": {},
+   "description": "Turns the Oil tile into a Plain tile.",
+   "raw": {
+    "name": "Remove Ground Oil",
+    "id": 67,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "remove_ground_oil_notsaved",
+    "description": "Turns the Oil tile into a Plain tile.",
+    "only_specific_tiles": [
+     "ground_oil"
+    ],
+    "show_tile_in_build_grid": [
+     "ground_oil"
+    ],
+    "eco_tokens_for_this_action": 2000,
+    "display_even_if_has_street": true,
+    "polution": -5,
+    "cost": {
+     "gold": 1500000,
+     "rocks": 75000,
+     "steel": 40000
+    },
+    "has_quick_tool": 1,
+    "required_level": 53,
+    "is_terrain_modifier": 1,
+    "base_polution": -5
+   }
+  },
+  {
+   "key": "remove_thermal_spot_notsaved",
+   "id": 73,
+   "name": "Remove Thermal Spot",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 64,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 3500000,
+    "stone": 45000,
+    "steel": 40000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "thermal"
+    ],
+    "forbidden": [
+     "just_thermalised"
+    ]
+   },
+   "rules": {},
+   "description": "Turns the thermal spot tile into a Plain tile.",
+   "raw": {
+    "name": "Remove Thermal Spot",
+    "id": 73,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "remove_thermal_spot_notsaved",
+    "description": "Turns the thermal spot tile into a Plain tile.",
+    "only_specific_tiles": [
+     "thermal"
+    ],
+    "show_tile_in_build_grid": [
+     "thermal"
+    ],
+    "forbidden_tiles": [
+     "just_thermalised"
+    ],
+    "cost": {
+     "gold": 3500000,
+     "rocks": 45000,
+     "steel": 40000
+    },
+    "confirmation_required": 1,
+    "confirmation_text": "Are you sure you want to clear this thermal spot?",
+    "has_quick_tool": 1,
+    "required_level": 64,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "lava_rift_to_thermal_notsaved",
+   "id": 83,
+   "name": "Thermal spot",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 80,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "lava_rift"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Thermal spot",
+    "id": 83,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "lava_rift_to_thermal_notsaved",
+    "only_specific_tiles": [
+     "lava_rift"
+    ],
+    "has_quick_tool": 1,
+    "required_level": 80,
+    "tease_from_level": 74,
+    "show_even_if_level_not_mettask": true,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "cytrium_to_thermal_notsaved",
+   "id": 171,
+   "name": "Thermal spot",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 163,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 150000000,
+    "steel": 25000000,
+    "cytrium": 450
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "copper_field",
+     "golden_field",
+     "golden_island",
+     "pavement",
+     "ground_oil",
+     "rubble1",
+     "rubble2",
+     "rubble3",
+     "rubble4",
+     "sand",
+     "desert",
+     "disrupted_earth",
+     "broken_rail"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Thermal spot",
+    "id": 171,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "cytrium_to_thermal_notsaved",
+    "forbidden_tiles": [
+     "copper_field",
+     "golden_field",
+     "golden_island",
+     "pavement",
+     "ground_oil",
+     "rubble1",
+     "rubble2",
+     "rubble3",
+     "rubble4",
+     "sand",
+     "desert",
+     "disrupted_earth",
+     "broken_rail"
+    ],
+    "cost": {
+     "gold": 150000000,
+     "steel": 25000000,
+     "cytrium": 450
+    },
+    "has_quick_tool": 1,
+    "required_level": 163,
+    "show_even_if_level_not_mettask": true,
+    "is_terrain_modifier": 1,
+    "can_put_into_storage": true
+   }
+  },
+  {
+   "key": "revitalise_lava_rift_notsaved",
+   "id": 82,
+   "name": "Revitalise Lava",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 74,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "lava_rift"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Revitalise Lava",
+    "id": 82,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "revitalise_lava_rift_notsaved",
+    "only_specific_tiles": [
+     "lava_rift"
+    ],
+    "eco_tokens_for_this_action": 1200,
+    "has_quick_tool": 1,
+    "required_level": 74,
+    "show_even_if_level_not_met": true,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "show_storage_notsaved",
+   "id": 84,
+   "name": "Storage overview",
+   "category": [],
+   "level": 30,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "sensor_tower",
+     "radar"
+    ]
+   },
+   "rules": {},
+   "description": "Shows list of items in storage",
+   "raw": {
+    "name": "Storage overview",
+    "id": 84,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "show_storage_notsaved",
+    "description": "Shows list of items in storage",
+    "only_specific_tiles": [
+     "sensor_tower",
+     "radar"
+    ],
+    "works_even_with_building": 1,
+    "required_level": 30,
+    "hidden_in_levelup": 1,
+    "no_recalculations": 1
+   }
+  },
+  {
+   "key": "rotate_station_notsaved",
+   "id": 88,
+   "name": "Rotate",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "is_train_station"
+    ]
+   },
+   "rules": {},
+   "description": "Rotate",
+   "raw": {
+    "name": "Rotate",
+    "id": 88,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "rotate_station_notsaved",
+    "description": "Rotate",
+    "only_specific_tiles": [
+     "is_train_station"
+    ],
+    "works_even_with_building": 1,
+    "required_level": 0,
+    "hidden_in_levelup": 1,
+    "no_recalculations": 1
+   }
+  },
+  {
+   "key": "submerge_notsaved",
+   "id": 95,
+   "name": "Submerge",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "water_generator",
+     "water_generator_2",
+     "water_generator_3"
+    ]
+   },
+   "rules": {
+    "requires_upgrade": 139
+   },
+   "description": "Submerge all Sea Generators for a nicer view. Power production remains the same.",
+   "raw": {
+    "name": "Submerge",
+    "id": 95,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "submerge_notsaved",
+    "description": "Submerge all Sea Generators for a nicer view. Power production remains the same.",
+    "requires_upgrade": 139,
+    "only_specific_tiles": [
+     "water_generator",
+     "water_generator_2",
+     "water_generator_3"
+    ],
+    "works_even_with_building": 1,
+    "required_level": 0,
+    "hidden_in_levelup": 1,
+    "no_recalculations": 1
+   }
+  },
+  {
+   "key": "uranium_bomb_notsaved",
+   "id": 96,
+   "name": "Explosive Depth Charge",
+   "category": [
+    "Landscaping",
+    "Special"
+   ],
+   "level": 78,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "lava_rift"
+    ],
+    "forbidden": [
+     "farmfield",
+     "farmfield2"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "raw": {
+    "name": "Explosive Depth Charge",
+    "id": 96,
+    "categories": [
+     7,
+     3
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "uranium_bomb_notsaved",
+    "special_offer_promo_text": "Use the Explosive Depth Charge to reshape the landscape and perhaps even uncover rare resources!",
+    "only_specific_tiles": [
+     "lava_rift"
+    ],
+    "forbidden_tiles": [
+     "farmfield",
+     "farmfield2"
+    ],
+    "no_water_pavement": true,
+    "pavement_not_allowed": 1,
+    "big_fish_placement_is_ok": 1,
+    "dont_pay": 1,
+    "dont_touch_the_terrain": 1,
+    "has_quick_tool": 1,
+    "required_level": 78,
+    "tease_from_level": 74,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "pavement_notsaved",
+   "id": 97,
+   "name": "Super Pavement",
+   "category": [
+    "Landscaping",
+    "Special"
+   ],
+   "level": null,
+   "unlock": "shop/story",
+   "event_type": null,
+   "premium": true,
+   "cost": {
+    "gems": 70
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "ground_oil",
+     "oil",
+     "desert",
+     "sand",
+     "golden_island",
+     "copper_field",
+     "farmfield",
+     "farmfield2",
+     "halloween_field",
+     "uranium_barrel",
+     "nuclear_plant_broken",
+     "blue_purifier_broken"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "raw": {
+    "name": "Super Pavement",
+    "id": 97,
+    "categories": [
+     7,
+     3
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "pavement_notsaved",
+    "display_even_if_has_street": 1,
+    "forbidden_tiles": [
+     "ground_oil",
+     "oil",
+     "desert",
+     "sand",
+     "golden_island",
+     "copper_field",
+     "farmfield",
+     "farmfield2",
+     "halloween_field",
+     "uranium_barrel",
+     "nuclear_plant_broken",
+     "blue_purifier_broken"
+    ],
+    "cost": {
+     "gems": 70
+    },
+    "pavement_not_allowed": 1,
+    "can_put_into_storage": true,
+    "disabled_in_towns": true,
+    "has_size_tool": 1,
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "required_level": 9999,
+    "only_tester_can_buy": true
+   }
+  },
+  {
+   "key": "pavement_deconstruct_notsaved",
+   "id": 98,
+   "name": "Deconstruct",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 50000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "pavement"
+    ]
+   },
+   "rules": {},
+   "description": "Remove pavement and put it back into storage",
+   "raw": {
+    "name": "Deconstruct",
+    "id": 98,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "pavement_deconstruct_notsaved",
+    "description": "Remove pavement and put it back into storage",
+    "only_specific_tiles": [
+     "pavement"
+    ],
+    "cost": {
+     "gold": 50000
+    },
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "required_level": 0
+   }
+  },
+  {
+   "key": "new_town_notsaved",
+   "id": 102,
+   "name": "Build Settlement",
+   "category": [
+    "Special"
+   ],
+   "level": 88,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 500000000,
+    "stone": 160000000,
+    "steel": 130000000,
+    "uranium": 90000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "golden_island",
+     "golden_field",
+     "copper_field",
+     "ground_oil"
+    ]
+   },
+   "rules": {
+    "requires_road": true,
+    "pavement_allowed": false
+   },
+   "raw": {
+    "name": "Build Settlement",
+    "id": 102,
+    "categories": [
+     3
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "new_town_notsaved",
+    "forbidden_tiles": [
+     "golden_island",
+     "golden_field",
+     "copper_field",
+     "ground_oil"
+    ],
+    "cost": {
+     "gold": 500000000,
+     "rocks": 160000000,
+     "steel": 130000000,
+     "uranium_battery": 90000
+    },
+    "pavement_not_allowed": true,
+    "no_water_pavement": true,
+    "no_terrain_bg": true,
+    "requires_street": true,
+    "required_level": 88
+   }
+  },
+  {
+   "key": "water_uran_notsaved",
+   "id": 103,
+   "name": "Build test uraniumlake",
+   "category": [],
+   "level": null,
+   "unlock": "shop/story",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (see roads.json for roads).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "also": [
+     "titan",
+     "thermal",
+     "hill",
+     "mountain",
+     "water",
+     "swamp",
+     "lava_rift",
+     "rift",
+     "rift_big",
+     "scorched",
+     "swamp_rocks",
+     "broken_city_big",
+     "broken_city_medium",
+     "broken_city_small",
+     "airplane_wreck"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Build test uraniumlake",
+    "id": 103,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "water_uran_notsaved",
+    "cost": {
+     "gold": 1
+    },
+    "has_quick_tool": 1,
+    "also_allowed_tiles": [
+     "titan",
+     "thermal",
+     "hill",
+     "mountain",
+     "water",
+     "swamp",
+     "lava_rift",
+     "rift",
+     "rift_big",
+     "scorched",
+     "swamp_rocks",
+     "broken_city_big",
+     "broken_city_medium",
+     "broken_city_small",
+     "airplane_wreck"
+    ],
+    "also_on_water": 1,
+    "also_on_uran_water": 1,
+    "no_water_pavement": true,
+    "no_terrain_bg": true,
+    "required_level": 9999,
+    "works_on_uranium": 1,
+    "works_even_with_building": 1
+   }
+  },
+  {
+   "key": "destroy_uranium_water_barrel_notsaved",
+   "id": 104,
+   "name": "Destroy",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "water_uran_barrel"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Destroy",
+    "id": 104,
+    "categories": [],
+    "tile_categories": [],
+    "required_level": 0,
+    "grid_key": "destroy_uranium_water_barrel_notsaved",
+    "only_specific_tiles": [
+     "water_uran_barrel"
+    ],
+    "show_even_if_level_not_met": true,
+    "has_quick_tool": 1,
+    "also_on_uran_water": 1,
+    "works_even_with_building": 1,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "clear_mud_notsaved",
+   "id": 105,
+   "name": "Revitalise",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 5000000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "mud"
+    ]
+   },
+   "rules": {},
+   "description": "change the tile into plain tile.",
+   "raw": {
+    "name": "Revitalise",
+    "id": 105,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "clear_mud_notsaved",
+    "description": "change the tile into plain tile.",
+    "only_specific_tiles": [
+     "mud"
+    ],
+    "cost": {
+     "gold": 5000000
+    },
+    "show_even_if_level_not_met": true,
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "required_level": 0
+   }
+  },
+  {
+   "key": "clear_disrupted_notsaved",
+   "id": 106,
+   "name": "Revitalise",
+   "category": [],
+   "level": 0,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 20000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "disrupted_earth"
+    ]
+   },
+   "rules": {},
+   "description": "change the tile into plain tile.",
+   "raw": {
+    "name": "Revitalise",
+    "id": 106,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "clear_disrupted_notsaved",
+    "description": "change the tile into plain tile.",
+    "only_specific_tiles": [
+     "disrupted_earth"
+    ],
+    "cost": {
+     "gold": 20000
+    },
+    "show_even_if_level_not_met": true,
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "required_level": 0
+   }
+  },
+  {
+   "key": "bomb_hills_notsaved",
+   "id": 124,
+   "name": "Create Hills",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 98,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 25000000,
+    "uranium": 13000,
+    "clay": 2
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "description": "With right amount of uranium you can create anything.",
+   "raw": {
+    "name": "Create Hills",
+    "id": 124,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "show_tile_in_build_grid": "hills",
+    "grid_key": "bomb_hills_notsaved",
+    "description": "With right amount of uranium you can create anything.",
+    "cost": {
+     "gold": 25000000,
+     "uranium_battery": 13000,
+     "clay": 2
+    },
+    "has_quick_tool": 1,
+    "has_size_tool": 1,
+    "is_terrain_modifier": 1,
+    "forbidden_tiles": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ],
+    "pavement_not_allowed": true,
+    "required_level": 98
+   }
+  },
+  {
+   "key": "bomb_mountain_notsaved",
+   "id": 125,
+   "name": "Create Mountains",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 101,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 35000000,
+    "uranium": 18000,
+    "clay": 12
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "description": "With right amount of uranium you can create anything.",
+   "raw": {
+    "name": "Create Mountains",
+    "id": 125,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "show_tile_in_build_grid": "mountains",
+    "grid_key": "bomb_mountain_notsaved",
+    "description": "With right amount of uranium you can create anything.",
+    "cost": {
+     "gold": 35000000,
+     "uranium_battery": 18000,
+     "clay": 12
+    },
+    "has_quick_tool": 1,
+    "has_size_tool": 1,
+    "is_terrain_modifier": 1,
+    "forbidden_tiles": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ],
+    "pavement_not_allowed": true,
+    "required_level": 101
+   }
+  },
+  {
+   "key": "dig_water_notsaved",
+   "id": 123,
+   "name": "Expand Water",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 105,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "description": "Useable next to non-River Water tiles. Can't remove all land tiles around a Shipyard.",
+   "raw": {
+    "name": "Expand Water",
+    "id": 123,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "show_tile_in_build_grid": "water",
+    "grid_key": "dig_water_notsaved",
+    "description": "Useable next to non-River Water tiles. Can't remove all land tiles around a Shipyard.",
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "forbidden_tiles": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ],
+    "pavement_not_allowed": true,
+    "required_level": 105
+   }
+  },
+  {
+   "key": "boom_rift_notsaved",
+   "id": 126,
+   "name": "Create a Rift",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 109,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 25000000,
+    "uranium": 21000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "description": "Rip the land apart to create a rift.",
+   "raw": {
+    "name": "Create a Rift",
+    "id": 126,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "show_tile_in_build_grid": "rift",
+    "grid_key": "boom_rift_notsaved",
+    "description": "Rip the land apart to create a rift.",
+    "cost": {
+     "gold": 25000000,
+     "uranium_battery": 21000
+    },
+    "has_quick_tool": 1,
+    "forbidden_tiles": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ],
+    "is_terrain_modifier": 1,
+    "pavement_not_allowed": true,
+    "required_level": 109
+   }
+  },
+  {
+   "key": "boom_rift_big_notsaved",
+   "id": 230,
+   "name": "Create a Greater Rift",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 169,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "titanium": 150000,
+    "uranium": 370000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "description": "Rip the land apart to create a greater rift.",
+   "raw": {
+    "name": "Create a Greater Rift",
+    "id": 230,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "show_tile_in_build_grid": "rift_big",
+    "grid_key": "boom_rift_big_notsaved",
+    "description": "Rip the land apart to create a greater rift.",
+    "cost": {
+     "titanium": 150000,
+     "uranium_battery": 370000
+    },
+    "has_quick_tool": 1,
+    "forbidden_tiles": [
+     "ground_oil",
+     "copper_field",
+     "golden_island"
+    ],
+    "is_terrain_modifier": 1,
+    "pavement_not_allowed": true,
+    "required_level": 169
+   }
+  },
+  {
+   "key": "clear_broken_rail_notsaved",
+   "id": 136,
+   "name": "Revitalise",
+   "category": [],
+   "level": 2,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 500
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "broken_rail"
+    ]
+   },
+   "rules": {},
+   "description": "change the tile into plain tile.",
+   "raw": {
+    "name": "Revitalise",
+    "id": 136,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "clear_broken_rail_notsaved",
+    "description": "change the tile into plain tile.",
+    "only_specific_tiles": [
+     "broken_rail"
+    ],
+    "cost": {
+     "gold": 500
+    },
+    "show_even_if_level_not_met": true,
+    "required_level": 2,
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1
+   }
+  },
+  {
+   "key": "dig_notsaved",
+   "id": 150,
+   "name": "Dig",
+   "category": [],
+   "level": null,
+   "unlock": "shop/story",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 50000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "also": [
+     "digged"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "raw": {
+    "name": "Dig",
+    "id": 150,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "dig_notsaved",
+    "pavement_not_allowed": 1,
+    "cost": {
+     "gold": 50000
+    },
+    "has_quick_tool": 1,
+    "required_level": 9999,
+    "is_terrain_modifier": 1,
+    "also_allowed_tiles": [
+     "digged"
+    ]
+   }
+  },
+  {
+   "key": "harvest_ast_gem_notsaved",
+   "id": 164,
+   "name": "Harvest gems",
+   "category": [],
+   "level": 55,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "asteroid_2g",
+     "asteroid_3g"
+    ]
+   },
+   "rules": {},
+   "description": "Extracts valuable gems from gemstones",
+   "raw": {
+    "name": "Harvest gems",
+    "id": 164,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "harvest_ast_gem_notsaved",
+    "required_level": 55,
+    "description": "Extracts valuable gems from gemstones",
+    "tease_from_level": 1,
+    "has_quick_tool": 1,
+    "only_specific_tiles": [
+     "asteroid_2g",
+     "asteroid_3g"
+    ],
+    "hidden_in_levelup": 1
+   }
+  },
+  {
+   "key": "harvest_ast_cythrodium_1_notsaved",
+   "id": 166,
+   "name": "Harvest",
+   "category": [
+    "Special"
+   ],
+   "level": 55,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "asteroid_1",
+     "asteroid_2c",
+     "asteroid_3c"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Harvest",
+    "id": 166,
+    "categories": [
+     3
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "harvest_ast_cythrodium_1_notsaved",
+    "required_level": 55,
+    "tease_from_level": 1,
+    "only_specific_tiles": [
+     "asteroid_1",
+     "asteroid_2c",
+     "asteroid_3c"
+    ],
+    "hidden_in_levelup": 1,
+    "has_quick_tool": 1
+   }
+  },
+  {
+   "key": "harvest_ast_cythrodium_2_notsaved",
+   "id": 167,
+   "name": "Harvest",
+   "category": [
+    "Special"
+   ],
+   "level": 55,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "asteroid_1",
+     "asteroid_2c",
+     "asteroid_3c"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Harvest",
+    "id": 167,
+    "categories": [
+     3
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "harvest_ast_cythrodium_2_notsaved",
+    "required_level": 55,
+    "tease_from_level": 1,
+    "only_specific_tiles": [
+     "asteroid_1",
+     "asteroid_2c",
+     "asteroid_3c"
+    ],
+    "hidden_in_levelup": 1,
+    "has_quick_tool_if_in_storage": 1
+   }
+  },
+  {
+   "key": "harvest_ast_cythrodium_3_notsaved",
+   "id": 168,
+   "name": "Harvest",
+   "category": [
+    "Special"
+   ],
+   "level": 55,
+   "unlock": "level",
+   "event_type": null,
+   "premium": true,
+   "cost": {
+    "gems": 150
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "asteroid_1",
+     "asteroid_2c",
+     "asteroid_3c"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Harvest",
+    "id": 168,
+    "categories": [
+     3
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "harvest_ast_cythrodium_3_notsaved",
+    "required_level": 55,
+    "tease_from_level": 1,
+    "only_specific_tiles": [
+     "asteroid_1",
+     "asteroid_2c",
+     "asteroid_3c"
+    ],
+    "is_action": 1,
+    "cost": {
+     "gems": 150
+    },
+    "has_quick_tool": 1,
+    "hidden_in_levelup": 1,
+    "can_put_into_storage": true
+   }
+  },
+  {
+   "key": "harvest_ast_cythrodium_4_notsaved",
+   "id": 169,
+   "name": "Harvest",
+   "category": [
+    "Special"
+   ],
+   "level": 143,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Special Tiles"
+    ],
+    "only": [
+     "asteroid_1",
+     "asteroid_2c",
+     "asteroid_3c"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Harvest",
+    "id": 169,
+    "categories": [
+     3
+    ],
+    "tile_categories": [
+     103
+    ],
+    "grid_key": "harvest_ast_cythrodium_4_notsaved",
+    "required_level": 143,
+    "tease_from_level": 50,
+    "has_quick_tool": 1,
+    "only_specific_tiles": [
+     "asteroid_1",
+     "asteroid_2c",
+     "asteroid_3c"
+    ]
+   }
+  },
+  {
+   "key": "expand_land_notsaved",
+   "id": 172,
+   "name": "Expand Land",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 147,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "cost_note": "Price is calculated in game (scales with count or tile).",
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Water"
+    ],
+    "forbidden": [
+     "oil"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "description": "Fills water with land, but the cost depends on the amount of land next to this tile",
+   "raw": {
+    "name": "Expand Land",
+    "id": 172,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     102
+    ],
+    "show_tile_in_build_grid": "grass",
+    "grid_key": "expand_land_notsaved",
+    "description": "Fills water with land, but the cost depends on the amount of land next to this tile",
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "has_size_tool": 1,
+    "is_water_building": 1,
+    "tease_from_level": 105,
+    "forbidden_tiles": [
+     "oil"
+    ],
+    "pavement_not_allowed": true,
+    "required_level": 147
+   }
+  },
+  {
+   "key": "rotate_river_notsaved",
+   "id": 192,
+   "name": "Rotate",
+   "category": [],
+   "level": 86,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": null,
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "river"
+    ]
+   },
+   "rules": {},
+   "description": "Rotate and change the water's path",
+   "raw": {
+    "name": "Rotate",
+    "id": 192,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "rotate_river_notsaved",
+    "show_tile_in_build_grid": "rivers/river_t1_11",
+    "description": "Rotate and change the water's path",
+    "only_specific_tiles": [
+     "river"
+    ],
+    "works_even_with_building": 1,
+    "required_level": 86,
+    "no_recalculations": 1
+   }
+  },
+  {
+   "key": "place_river_notsaved",
+   "id": 193,
+   "name": "River",
+   "category": [
+    "Landscaping"
+   ],
+   "level": null,
+   "unlock": "shop/story",
+   "event_type": null,
+   "premium": true,
+   "cost": {
+    "gems": 999
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "only": [
+     "grass"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "description": "it flows.",
+   "raw": {
+    "name": "River",
+    "id": 193,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "place_river_notsaved",
+    "description": "it flows.",
+    "only_specific_tiles": [
+     "grass"
+    ],
+    "pavement_not_allowed": 1,
+    "cost": {
+     "gems": 999
+    },
+    "has_quick_tool": 1,
+    "required_level": 9999,
+    "can_put_into_storage": true
+   }
+  },
+  {
+   "key": "cut_titanium_tile_notsaved",
+   "id": 200,
+   "name": "Cut Titanium",
+   "category": [],
+   "level": 133,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "steel": 100000,
+    "uranium": 500000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [],
+    "only": [
+     "titan"
+    ]
+   },
+   "rules": {},
+   "raw": {
+    "name": "Cut Titanium",
+    "id": 200,
+    "categories": [],
+    "tile_categories": [],
+    "grid_key": "cut_titanium_tile_notsaved",
+    "only_specific_tiles": [
+     "titan"
+    ],
+    "cost": {
+     "steel": 100000,
+     "uranium_battery": 500000
+    },
+    "has_quick_tool": 1,
+    "is_terrain_modifier": 1,
+    "tease_from_level": 125,
+    "works_even_with_building": 1,
+    "required_level": 133
+   }
+  },
+  {
+   "key": "farm_field_adv_notsaved",
+   "id": 257,
+   "name": "Advanced Farm field",
+   "category": [
+    "Nature",
+    "Resource Production"
+   ],
+   "level": 196,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "gold": 100
+   },
+   "destroy_cost": {
+    "gold": 50
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "sand",
+     "ground_oil",
+     "copper_field",
+     "golden_island",
+     "uranium_field",
+     "desert"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "raw": {
+    "name": "Advanced Farm field",
+    "id": 257,
+    "categories": [
+     8,
+     2
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "farm_field_adv_notsaved",
+    "isBasicForest": 1,
+    "forbidden_tiles": [
+     "sand",
+     "ground_oil",
+     "copper_field",
+     "golden_island",
+     "uranium_field",
+     "desert"
+    ],
+    "cost": {
+     "gold": 100
+    },
+    "destroy_gold_cost": 50,
+    "has_quick_tool": 1,
+    "has_size_tool": 1,
+    "pavement_not_allowed": 1,
+    "required_level": 196,
+    "hidden_in_filter": 1
+   }
+  },
+  {
+   "key": "create_sand_notsaved",
+   "id": 261,
+   "name": "Create a Sand",
+   "category": [
+    "Landscaping"
+   ],
+   "level": 204,
+   "unlock": "level",
+   "event_type": null,
+   "premium": false,
+   "cost": {
+    "uranium": 100000,
+    "red_chips": 3000
+   },
+   "power": null,
+   "pollution": null,
+   "income": {},
+   "tiles": {
+    "categories": [
+     "Plain"
+    ],
+    "forbidden": [
+     "sand",
+     "ground_oil",
+     "copper_field",
+     "golden_island",
+     "uranium_field"
+    ]
+   },
+   "rules": {
+    "pavement_allowed": false
+   },
+   "description": "Drains every drop of groundwater and erodes the surface, converting fertile grassland into a barren Sand tile.",
+   "raw": {
+    "name": "Create a Sand",
+    "id": 261,
+    "categories": [
+     7
+    ],
+    "tile_categories": [
+     101
+    ],
+    "grid_key": "create_sand_notsaved",
+    "description": "Drains every drop of groundwater and erodes the surface, converting fertile grassland into a barren Sand tile.",
+    "cost": {
+     "uranium_battery": 100000,
+     "red_chips": 3000
+    },
+    "has_quick_tool": 1,
+    "has_size_tool": 1,
+    "forbidden_tiles": [
+     "sand",
+     "ground_oil",
+     "copper_field",
+     "golden_island",
+     "uranium_field"
+    ],
+    "is_terrain_modifier": 1,
+    "pavement_not_allowed": true,
+    "ignore_buildings": [
+     "solar_big"
+    ],
+    "required_level": 204
+   }
+  }
+ ]
+}

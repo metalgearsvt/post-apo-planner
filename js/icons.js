@@ -8,7 +8,7 @@ const DB = 'pat-icons', STORE = 'pack', KEY = 'current';
 
 // id -> canvas; r: tiles that join their neighbours, road id (or RIVER) -> Map(variant -> canvas)
 export const icons = { b: new Map(), t: new Map(), r: new Map(), source: null };
-export const RIVER = 'terrain:river', RIVER_TREES = 'terrain:river_trees';
+export const RIVER = 'terrain:river', RIVER_TREES = 'terrain:river_trees', RAILS = 'rails';
 const urlCache = new Map();
 
 function idb(mode, fn) {
@@ -93,7 +93,7 @@ async function fromFolder() {
       const img = sheets.get(s.file); if (img) icons[kind].set(id, crop(img, s.x == null ? null : s));
     }
   }
-  for (const [id, vs] of [...Object.entries(m.roads || {}), [RIVER, m.river || {}], [RIVER_TREES, m.river_trees || {}]]) {
+  for (const [id, vs] of [...Object.entries(m.roads || {}), [RIVER, m.river || {}], [RIVER_TREES, m.river_trees || {}], [RAILS, m.rails || {}]]) {
     const out = new Map();
     for (const [v, s] of Object.entries(vs)) { const img = sheets.get(s.file); if (img) out.set(v, cropTile(img, s.x == null ? null : s)); }
     if (out.size) icons.r.set(id, out);

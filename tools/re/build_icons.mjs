@@ -24,11 +24,14 @@ const PACK_FILE = {
   icons: 'atlas/icons1.png', icons2: 'atlas/icons2.png', icons3: 'atlas/icons3.png', roads12: 'atlas/roads12.png',
   roads34: 'atlas/roads34.png', shores: 'atlas/shores.png', rivers: 'atlas/rivers.png', bat1: 'atlas/bat1.png',
   bat2: 'atlas/bat2.png', bat3: 'atlas/bat3.png', bat4: 'atlas/bat4.png', sidekick: 'atlas/sidekick_v2.png', waters: 'atlas/waters.png',
+  trains: 'atlas/trains.png', trains_2: 'atlas/trains_2.png', trains_3: 'atlas/trains_3.png', trains_4: 'atlas/trains_4.png',
 };
 
 // name -> {file, x, y, w, h}
 const sprites = new Map();
-const src = fs.readFileSync(preloader, 'utf8');
+// Rail sprites (trains/rails_t1_*) are defined next to the train definitions, not in the preloader.
+const trainDefs = path.join(path.dirname(preloader), 'train_defs.js');
+const src = fs.readFileSync(preloader, 'utf8') + (fs.existsSync(trainDefs) ? '\n' + fs.readFileSync(trainDefs, 'utf8') : '');
 const re = /images_(\w+)\['([^']+)'\]\s*=\s*\{([^}]*)\}/g;
 for (const m of src.matchAll(re)) {
   const body = m[3];
@@ -101,6 +104,16 @@ for (const [key, t] of [['river', 't1'], ['river_trees', 't2']]) {
   }
 }
 
+// Rails turn with their neighbours like roads (the game's AutoRotateRails), with end pieces 22/44/66/88.
+// <v>_b are the pieces on water, 11_b_sea a straight sea bridge, and 11_b_road / 12_b the rails over a road
+// (a level crossing; 12_b is also the vertical river bridge).
+manifest.rails = {};
+for (const v of ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '22', '44', '66', '88',
+  '1_b', '2_b', '3_b', '4_b', '5_b', '6_b', '7_b', '8_b', '9_b', '11_b', '12_b', '11_b_sea', '11_b_road']) {
+  const s = resolve(`trains/rails_t1_${v}`);
+  if (s) { manifest.rails[v] = s; used.add(s.file); }
+}
+
 const terrainKeyFor = Object.fromEntries(Object.entries(TILE_TO_TERRAIN).map(([g, t]) => [t, g]));
 for (const t of TERRAIN) {
   const name = PLANNER_TERRAIN_IMAGES[t.id] || terrainImage[terrainKeyFor[t.id]] || terrainKeyFor[t.id];
@@ -116,6 +129,6 @@ for (const f of used) {
 manifest.files = [...used];
 fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 1));
 console.log(`icons: ${Object.keys(manifest.buildings).length}/${BUILDINGS.length} buildings, ${Object.keys(manifest.terrain).length}/${TERRAIN.length} terrain, ${used.size} image files`);
-console.log(`road sprites: ${Object.keys(manifest.roads).length} road types, river sprites: ${Object.keys(manifest.river).length}`);
+console.log(`road sprites: ${Object.keys(manifest.roads).length} road types, river sprites: ${Object.keys(manifest.river).length}, rail sprites: ${Object.keys(manifest.rails).length}`);
 console.log('no image for buildings:', missing.buildings.join(' ') || 'none');
 console.log('no image for terrain:', missing.terrain.join(' ') || 'none');

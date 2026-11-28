@@ -5,7 +5,7 @@ import {
   getProfile, profileActive, setProfile, setProfileEnabled, clearProfile,
 } from './catalog.js';
 import { analyze, effRadius, waterRange, needsRoad } from './analyze.js';
-import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack, connVariant, RIVER, RIVER_TREES } from './icons.js';
+import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack, connVariant, RIVER, RIVER_TREES, RAILS } from './icons.js';
 import { readGrid, gridBounds, gridToPlan } from './gamemap.js';
 import { loadPlans, savePlans, deletePlan } from './store.js';
 
@@ -421,7 +421,8 @@ function drawBuilding(b, i, x, y, X, Y, s, alpha, ghost = false) {
   drawBuildingBody(b, i, x, y, X, Y, s, alpha, ghost);
   if (b?.isRoad && !ghost && plan.rail[i]) drawRails(x, y, X, Y, s); // level crossing: rails over the road
 }
-// Rails as a brown track joining neighbouring rails (rail tiles or other crossings).
+// Rails join neighbouring rails (rail tiles or other crossings): the game's rail sprite when icons are loaded,
+// else a brown track.
 function drawRails(x, y, X, Y, s, ghost = false) {
   const { w, h, bld } = plan;
   const conn = (nx, ny) => {
@@ -429,6 +430,8 @@ function drawRails(x, y, X, Y, s, ghost = false) {
     const j = ny * w + nx;
     return !!catalog.bMap.get(bld[j])?.isRail || !!plan.rail[j];
   };
+  const sprite = !ghost && s >= 8 && settings.useIcons ? railSprite(x, y, conn) : null;
+  if (sprite) { drawTile(sprite, X, Y, s); return; }
   const rw = s * 0.22, o = (s - rw) / 2;
   ctx.fillStyle = '#5a3e2b';
   ctx.fillRect(X + o, Y + o, rw, rw);
@@ -437,6 +440,27 @@ function drawRails(x, y, X, Y, s, ghost = false) {
   if (conn(x, y - 1)) ctx.fillRect(X + o, Y, rw, o + 1);
   if (conn(x, y + 1)) ctx.fillRect(X + o, Y + o + rw - 1, rw, o + 1);
   if (s >= 12) { ctx.strokeStyle = '#c9c9c9'; ctx.lineWidth = 1; ctx.strokeRect(X + o + 1, Y + o + 1, rw - 2, rw - 2); }
+}
+// Which rail sprite the game draws (AutoRotateRails): across a road the rails run straight over it
+// (11_b_road / 12_b), on a river they bridge it, on the sea they use the _b pieces; elsewhere they turn like roads
+// and have end pieces, and a lone rail uses piece 4.
+function railSprite(x, y, conn) {
+  const set = icons.r.get(RAILS); if (!set) return null;
+  const i = y * plan.w + x, t = plan.terrain[i];
+  const up = conn(x, y - 1), down = conn(x, y + 1), left = conn(x - 1, y), right = conn(x + 1, y);
+  const horiz = (left || right) && !(up || down) ? true : (up || down) && !(left || right) ? false : null;
+  if (plan.rail[i]) { // level crossing: rails cross the road
+    const road = (nx, ny) => nx >= 0 && ny >= 0 && nx < plan.w && ny < plan.h && roadLike(catalog.bMap.get(plan.bld[ny * plan.w + nx]));
+    const h = horiz ?? !(road(x - 1, y) || road(x + 1, y));
+    return set.get(h ? '11_b_road' : '12_b') || set.get(h ? '11' : '12');
+  }
+  if (t === 'river') return set.get(horiz === false ? '12_b' : '11_b');
+  const v = connVariant(up, down, left, right, true);
+  if (catalog.tMap.get(t)?.water) {
+    const wv = v === '22' || v === '88' ? '12' : v === '44' || v === '66' || v === '13' ? '11' : v;
+    return set.get(wv + '_b') || set.get(wv);
+  }
+  return set.get(v === '13' ? '4' : v) || set.get('4');
 }
 function drawBuildingBody(b, i, x, y, X, Y, s, alpha, ghost) {
   if (!b) { ctx.fillStyle = '#f0f'; ctx.fillRect(X + s * .2, Y + s * .2, s * .6, s * .6); return; }

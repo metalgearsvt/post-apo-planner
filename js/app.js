@@ -116,7 +116,7 @@ function analysisSettings() {
   if (!profileActive()) return settings;
   const p = getProfile(), up = { ...settings.upgrades, ...(p.upgrades || {}) };
   for (const k of p.baked || []) up[k] = false;
-  return { ...settings, upgrades: up, pollution: p.pollution };
+  return { ...settings, upgrades: up, pollution: p.pollution, power: p.power };
 }
 function reanalyze() { result = analyze(plan, analysisSettings()); }
 // On big plans a full re-check on every pointer move makes painting stutter; it runs once when the stroke ends instead.
@@ -860,6 +860,14 @@ function pollRows(T) {
     <tr><td><b>Total</b></td><td class="n"><b>${sign(T.poll)}</b></td></tr></table>
     ${acc.length ? '' : '<p class="note">The game also adds account-wide amounts (base +100,005, anti-pollution, cleared barrels…). Load your account values (Menu → My account values) to include them.</p>'}`;
 }
+function powerRows(T) {
+  const P = T.powerParts; if (!P) return '';
+  const acc = T.powerAccountParts || [];
+  const html = (r) => r.map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${sign(v)}</td></tr>`).join('');
+  return `<h3>Power</h3><table class="kv">${html([['Buildings producing', P.gen], ['Buildings using', -P.use], ['Towns using', -P.towns]].filter(([, v]) => v))}
+    ${acc.length ? `<tr><td colspan="2" class="muted small">Your account, not on the map:</td></tr>${html(acc)}` : ''}
+    <tr><td><b>Net</b></td><td class="n"><b>${sign(T.powerGen - T.powerUse)}</b></td></tr></table>`;
+}
 function renderStats() {
   const el = $('#tab-stats'); if (!result) return;
   const T = result.totals;
@@ -884,6 +892,7 @@ function renderStats() {
     ${net < 0 ? '<div class="issue">Power deficit — in game, all incomes drop proportionally until energy is balanced.</div>' : ''}
     <h3>Income</h3>
     ${resRows ? `<table class="kv"><tr><th>Resource</th><th class="n">per 9s</th><th class="n">per hour</th></tr>${resRows}</table>` : '<p class="muted small">No production yet.</p>'}
+    ${powerRows(T)}
     ${pollRows(T)}
     <h3>Build cost (total)</h3>
     ${costRows ? `<table class="kv">${costRows}</table>` : '<p class="muted small">—</p>'}

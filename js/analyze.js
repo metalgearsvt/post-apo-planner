@@ -62,6 +62,13 @@ export function townPollution(level, mega, factor = 1, flags = 0) {
   return Math.round(p * (flags & TF.ECO ? 0.75 : 1) * (flags & TF.ECO2 ? 0.65 : 1));
 }
 
+// electricity.js GetTownElectricitySpendByLevel. From the profile: `factor` = the Town Power Generator
+// upgrades, `freeBelow` = upgrade 454 (towns under that level use no power).
+export function townPowerUse(level, mega, { townFactor = 1, townFreeBelow = 0 } = {}) {
+  if (level <= REQ_ELECTRICITY_LEVEL || level < townFreeBelow) return 0;
+  return Math.round((30 + (level - REQ_ELECTRICITY_LEVEL) * 30) * (mega ? 1.5 : 1) * townFactor);
+}
+
 export function analyze(plan, settings) {
   const { w, h, terrain, bld, pave } = plan;
   const rail = plan.rail || []; // rails sharing a road tile (level crossings)
@@ -149,7 +156,9 @@ export function analyze(plan, settings) {
     }
     if (b.lvl && settings.level && b.lvl > settings.level) add(i, 'info', `${b.name} unlocks at Lv ${b.lvl} (you: ${settings.level})`);
     if (pave[i] && b.pave) {
-      if (b.pave.on === 'power' && c.power > 0) c.power = Math.round(c.power * (1 + b.pave.mult));
+      // The game adds the pavement % to any power producer, whatever else the pavement boosts
+      // (hrac_income_stats.js), except on cleaners where it boosts pollution clearing instead.
+      if (b.pave.on !== 'pollution' && c.power > 0) c.power *= 1 + b.pave.mult;
       if (b.pave.on === 'income') for (const k in c.income) c.income[k] = Math.round(c.income[k] * (1 + b.pave.mult));
       if (b.pave.on !== 'pollution') c.notes.push(`Pavement bonus +${Math.round(b.pave.mult * 100)}%`);
     }
@@ -293,8 +302,10 @@ export function analyze(plan, settings) {
   // aren't on the map at all (base pollution, purchases, cleared barrels…), from the account profile.
   const P = settings.pollution || {};
   const forestLvl = plan.forest || [], townLvl = plan.town || [], tflag = plan.tflag || [];
-  let forest = 0, deep = 0, towns = 0;
+  const W = settings.power || {};
+  let forest = 0, deep = 0, towns = 0, townPower = 0;
   for (let i = 0; i < n; i++) {
+    if (townLvl[i]) townPower += townPowerUse(townLvl[i], terrain[i] === 'megacity' || (terrain[i] === 'mainsettlement' && townLvl[i] === 45), W);
     const f = forestLvl[i] || (terrain[i] === 'forest' ? 1 : 0);
     if (f) forest -= f;
     // Deep water counts even where an oil spot, gem rock or wreck shows as the terrain.
@@ -309,6 +320,12 @@ export function analyze(plan, settings) {
     totals.poll += v; if (v > 0) totals.pollAdd += v; else totals.pollRem -= v;
   }
   totals.pollAccountParts = P.parts || null;
+
+  // Power: towns past level 20 use power, and the account adds power from upgrades and rewards.
+  totals.powerGen = Math.round(totals.powerGen); totals.powerUse = Math.round(totals.powerUse);
+  totals.powerParts = { gen: totals.powerGen, use: totals.powerUse, towns: townPower, account: W.account || 0 };
+  totals.powerUse += townPower; totals.powerGen += W.account || 0;
+  totals.powerAccountParts = W.parts || null;
 
   const rank = { bad: 0, warn: 1, info: 2 };
   issues.sort((a, b) => rank[a.lvl] - rank[b.lvl]);

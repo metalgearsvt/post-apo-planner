@@ -85,6 +85,25 @@ function accountPollution(h, owned) {
   };
 }
 
+// Power that depends on the account (hrac_income_stats.js / electricity.js), plus the Town Power Generator
+// factors js/analyze.js needs for towns.
+function accountPower(h, owned) {
+  const upgrades = J('data/game/upgrades.json').data;
+  const val = (id) => (owned.get(id) || 0) * (upgrades.find((u) => u.id === id)?.value || 0);
+  const parts = [
+    ['Power upgrades', val(100) + val(132) + val(166) + val(487)],                 // GetPowerFromUpgrades
+    ['Extra power (offers, rewards)', h.extra_electricity || 0],
+    ['Level power drain', -(h.electricity_perma_drain || 0)],
+  ].filter(([, v]) => v);
+  return {
+    account: parts.reduce((s, [, v]) => s + v, 0),
+    parts,
+    townFactor: (1 - 0.01 * val(67)) * (1 - 0.01 * val(140)) * (1 - 0.01 * val(455)),
+    townFreeBelow: val(454),
+    gameNet: h.electricity,                                                       // what the game showed, for comparison
+  };
+}
+
 // 3. Planner upgrade toggles. Effects already in the numbers above are "baked" and the toggles are ignored,
 //    so they can't be counted twice. The others come from what you own.
 const player = J(path.join(acc, 'player.json'));
@@ -104,6 +123,7 @@ const profile = {
   },
   baked: ['bigFarms', 'farmImplements', 'farmWatering'],
   pollution: accountPollution(player.player, owned),
+  power: accountPower(player.player, owned),
   buildings,
 };
 fs.writeFileSync(path.join(acc, 'profile.json'), JSON.stringify(profile, null, 1));

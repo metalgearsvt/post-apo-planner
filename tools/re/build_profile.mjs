@@ -90,8 +90,8 @@ function accountPollution(h, owned) {
 const player = J(path.join(acc, 'player.json'));
 const owned = new Map(player.upgrade_levels);
 // Upgrades js/analyze.js checks by id: road exemptions (ROAD_FREE_UPGRADES), Advanced Infrastructure (51),
-// Faster Iron Mines (36).
-const CHECKED = [25, 28, 52, 105, 149, 164, 212, 241, 358, 407, 428, 449, 468, 542, 51, 36];
+// Faster Iron Mines (36), Filter Arrays without a town (300).
+const CHECKED = [25, 28, 52, 105, 149, 164, 212, 241, 358, 407, 428, 449, 468, 542, 51, 36, 300];
 const profile = {
   kind: 'post-apo-planner-profile', version: 1,
   note: 'Building values with your game upgrades applied. Personal; contains no account identifiers.',

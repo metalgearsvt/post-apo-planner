@@ -35,6 +35,7 @@ export const ROAD_FREE_UPGRADES = {
 };
 export const ADVANCED_INFRASTRUCTURE = 51; // any connected building passes its road connection on
 export const FASTER_IRON_MINES = 36;       // each iron mine can feed 2 foundries
+export const FILTER_ARRAY_ANYWHERE = 300;  // Filter Arrays clean without a town next to them
 const owns = (settings, id) => !!settings.upgrades?.owned?.[id];
 
 export function needsRoad(b, terrainId, settings) {
@@ -49,12 +50,16 @@ export function needsRoad(b, terrainId, settings) {
 const DEEP_WATER_POLLUTION = 2;   // ships.js
 const REQ_ELECTRICITY_LEVEL = 20; // town_levels_config.js: towns pollute past this level
 const MEGA_CITY_FOG_LEVEL = 116;  // mega_town_cities.js
+// Per-tile flags kept from a game map import (plan.tflag), for things the planner terrain doesn't show.
+export const TF = { DEEP: 1, ECO: 2, ECO2: 4 };
 // pollution_clear_purifier.js GetTownPollutionByLevel. `factor` = the Town Cleaner upgrades (from the profile).
-export function townPollution(level, mega, factor = 1) {
+// Eco City and Eco City 2.0 cut a town's pollution by 25% and 35% (towns.js).
+export function townPollution(level, mega, factor = 1, flags = 0) {
   if (level <= REQ_ELECTRICITY_LEVEL) return 0;
   let p = 30 + (level - REQ_ELECTRICITY_LEVEL) * 10;
   if (level >= MEGA_CITY_FOG_LEVEL) p += (1 + level - MEGA_CITY_FOG_LEVEL) * 10;
-  return p * factor * (mega ? 1.5 : 1);
+  p *= factor * (mega ? 1.5 : 1);
+  return Math.round(p * (flags & TF.ECO ? 0.75 : 1) * (flags & TF.ECO2 ? 0.65 : 1));
 }
 
 export function analyze(plan, settings) {
@@ -146,7 +151,7 @@ export function analyze(plan, settings) {
     if (pave[i] && b.pave) {
       if (b.pave.on === 'power' && c.power > 0) c.power = Math.round(c.power * (1 + b.pave.mult));
       if (b.pave.on === 'income') for (const k in c.income) c.income[k] = Math.round(c.income[k] * (1 + b.pave.mult));
-      c.notes.push(`Pavement bonus +${Math.round(b.pave.mult * 100)}%`);
+      if (b.pave.on !== 'pollution') c.notes.push(`Pavement bonus +${Math.round(b.pave.mult * 100)}%`);
     }
     if (connected && !connected[i] && needsRoad(b, terrain[i], settings)) add(i, 'warn', `${b.name} is not connected to a settlement by road`);
     for (const rule of b.rules || []) {
@@ -174,7 +179,9 @@ export function analyze(plan, settings) {
           } else add(i, 'info', `${b.name} is not next to a settlement (misses bonus gold)`);
           break;
         case 'airCleanerThermal':
+          // pollution_clear_purifier.js GetMAirFilterPollution: -300 on a Thermal Spot, -180 elsewhere.
           if (terrain[i] === 'thermalspot') { c.power = 0; c.poll = -300; c.notes.push('On Thermal Spot: no power drain, -300 pollution'); }
+          else c.poll = -180;
           break;
         case 'allWater2': {
           let ok = true; around(i, 2, j => { if (!T(j)?.water) ok = false; });
@@ -190,6 +197,18 @@ export function analyze(plan, settings) {
           if (!anyAround(i, 1, j => Bd(j)?.isRail || rail[j])) add(i, 'warn', `${b.name} should be placed by rails`);
           break;
       }
+    }
+    // A Filter Array only cleans next to a town or village (touching sides), unless upgrade 300 is owned.
+    if (b.gameKey === 'filter_array_1' && !owns(settings, FILTER_ARRAY_ANYWHERE)) {
+      const [x, y] = xy(i);
+      if (!N4.some(([dx, dy]) => inside(x + dx, y + dy) && T(idx(x + dx, y + dy))?.settlement)) {
+        c.poll = 0; add(i, 'warn', `${b.name} cleans nothing unless it touches a town or village`);
+      }
+    }
+    // Pavement under a cleaner adds its bonus % to the pollution it clears (rounded per building, as in game).
+    if (pave[i] && b.pave?.on === 'pollution' && c.poll < 0) {
+      c.poll += Math.round(c.poll * b.pave.mult);
+      c.notes.push(`Pavement bonus +${Math.round(b.pave.mult * 100)}% pollution clearing`);
     }
   }
 
@@ -273,16 +292,16 @@ export function analyze(plan, settings) {
   // and Stop Burping, Cows (upgrade 200) makes each farm field clean. Then account-wide amounts that
   // aren't on the map at all (base pollution, purchases, cleared barrels…), from the account profile.
   const P = settings.pollution || {};
-  const forestLvl = plan.forest || [], townLvl = plan.town || [];
+  const forestLvl = plan.forest || [], townLvl = plan.town || [], tflag = plan.tflag || [];
   let forest = 0, deep = 0, towns = 0;
   for (let i = 0; i < n; i++) {
     const f = forestLvl[i] || (terrain[i] === 'forest' ? 1 : 0);
     if (f) forest -= f;
-    if (terrain[i] === 'deepwater') deep -= DEEP_WATER_POLLUTION;
-    if (townLvl[i]) towns += townPollution(townLvl[i], terrain[i] === 'megacity', P.townFactor ?? 1);
+    // Deep water counts even where an oil spot, gem rock or wreck shows as the terrain.
+    if (terrain[i] === 'deepwater' || (tflag[i] & TF.DEEP)) deep -= DEEP_WATER_POLLUTION;
+    if (townLvl[i]) towns += townPollution(townLvl[i], terrain[i] === 'megacity', P.townFactor ?? 1, tflag[i]);
   }
   if (P.forestBonusPct) forest += Math.round(forest * 0.01 * P.forestBonusPct);
-  towns = Math.round(towns);
   const fields = -fieldOwner.size * (P.fieldBonus || 0);
   const account = P.account || 0;
   totals.pollParts = { buildings: totals.poll, forest, deep, towns, fields, account };

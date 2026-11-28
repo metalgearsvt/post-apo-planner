@@ -37,7 +37,8 @@ function encodePlan(p) {
   const rx = []; p.rail.forEach((v, i) => { if (v) rx.push(i); });
   const fl = []; p.forest.forEach((v, i) => { if (v) fl.push([i, v]); });
   const tl = []; p.town.forEach((v, i) => { if (v) tl.push([i, v]); });
-  return { id: p.id, name: p.name, w: p.w, h: p.h, t, b, p: pv, x: rx, f: fl, tl, updated: Date.now(), view: p.view };
+  const tf = []; p.tflag.forEach((v, i) => { if (v) tf.push([i, v]); });
+  return { id: p.id, name: p.name, w: p.w, h: p.h, t, b, p: pv, x: rx, f: fl, tl, tf, updated: Date.now(), view: p.view };
 }
 function decodePlan(e) {
   const n = e.w * e.h;
@@ -49,12 +50,13 @@ function decodePlan(e) {
   const rail = new Array(n).fill(0); for (const i of e.x || []) if (i < n) rail[i] = 1;
   const forest = new Array(n).fill(0); for (const [i, v] of e.f || []) if (i < n) forest[i] = v;
   const town = new Array(n).fill(0); for (const [i, v] of e.tl || []) if (i < n) town[i] = v;
-  return { id: e.id, name: e.name, w: e.w, h: e.h, terrain, bld, pave, rail, forest, town, view: readJSON(LS.views, {})[e.id] || e.view };
+  const tflag = new Array(n).fill(0); for (const [i, v] of e.tf || []) if (i < n) tflag[i] = v;
+  return { id: e.id, name: e.name, w: e.w, h: e.h, terrain, bld, pave, rail, forest, town, tflag, view: readJSON(LS.views, {})[e.id] || e.view };
 }
 function makePlan(name, w, h, fill = 'grass', withMain = true) {
   const n = w * h;
   const p = { id: uid(), name, w, h, terrain: new Array(n).fill(fill), bld: new Array(n).fill(null), pave: new Array(n).fill(0), rail: new Array(n).fill(0),
-    forest: new Array(n).fill(0), town: new Array(n).fill(0) };
+    forest: new Array(n).fill(0), town: new Array(n).fill(0), tflag: new Array(n).fill(0) };
   if (withMain) p.terrain[((h / 2) | 0) * w + ((w / 2) | 0)] = 'mainsettlement';
   return p;
 }
@@ -176,7 +178,7 @@ function changed(save = true) {
 function applyTool(i, mode) {
   if (i < 0) return;
   // New terrain drops the imported forest / town level of the tile (painted Forest counts as level 1).
-  if (tool === 'terrain') { if (setCell(i, 'terrain', selTerrain)) { setCell(i, 'forest', 0); setCell(i, 'town', 0); } }
+  if (tool === 'terrain') { if (setCell(i, 'terrain', selTerrain)) { setCell(i, 'forest', 0); setCell(i, 'town', 0); setCell(i, 'tflag', 0); } }
   else if (tool === 'build') {
     const b = catalog.bMap.get(selBuilding);
     const cur = catalog.bMap.get(plan.bld[i]);
@@ -1090,7 +1092,7 @@ async function resizeDialog() {
     const X = x + dx, Y = y + dy; if (X < 0 || Y < 0 || X >= nw || Y >= nh) continue;
     const s = y * plan.w + x, t = Y * nw + X;
     np.terrain[t] = plan.terrain[s]; np.bld[t] = plan.bld[s]; np.pave[t] = plan.pave[s]; np.rail[t] = plan.rail[s];
-    np.forest[t] = plan.forest[s]; np.town[t] = plan.town[s];
+    np.forest[t] = plan.forest[s]; np.town[t] = plan.town[s]; np.tflag[t] = plan.tflag[s];
   }
   plan = np; switchedPlan(true);
 }
@@ -1313,7 +1315,7 @@ async function gameMapDialog(grid, fileName) {
   const region = { cx: +v.cx | 0, cy: +v.cy | 0, w: clamp(+v.w, 3, MAX_SIDE), h: clamp(+v.h, 3, MAX_SIDE) };
   const r = gridToPlan(grid, region, catalog.buildings);
   persistPlan(true);
-  plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave, rail: r.rail, forest: r.forest, town: r.town };
+  plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave, rail: r.rail, forest: r.forest, town: r.town, tflag: r.tflag };
   switchedPlan(true);
   const odd = Object.entries(r.report.unmatched);
   toast(`Imported ${fmt(r.report.buildings)} buildings and ${fmt(r.report.roads)} roads` + (odd.length ? ` (${odd.length} unknown building type(s) skipped)` : ''), 5000);

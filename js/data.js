@@ -31,7 +31,7 @@ export const TERRAIN = [...WIKI_TERRAIN, ...GAME_EXTRA_TERRAIN.filter((t) => !WI
 
 // Fields the game data can supply. Anything else (rules, radiusKind, abbr, colour, notes, flags
 // like foundry / isRoad) is planner logic and stays as the wiki catalog defines it.
-const GAME_FIELDS = ['name', 'lvl', 'cost', 'power', 'poll', 'income', 'uranium', 'tiles', 'radius', 'pave', 'premium', 'road', 'storage', 'fieldFood', 'waterWithin', 'mineLink'];
+const GAME_FIELDS = ['name', 'lvl', 'cost', 'power', 'poll', 'income', 'uranium', 'tiles', 'radius', 'pave', 'premium', 'road', 'storage', 'fieldFood', 'waterWithin', 'mineLink', 'linkFrom', 'linkSame', 'shipyard', 'mineOrigin'];
 
 function merge(wiki, game) {
   const b = { ...wiki };

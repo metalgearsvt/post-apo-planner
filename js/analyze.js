@@ -2,6 +2,10 @@
 import { catalog } from './catalog.js';
 
 const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+// Stone Conveyors boost all of these, Sea Stone Mines included (resource_storage.js GetRockBoostBonus).
+const STONE_MINES = new Set(['stone_mine', 'mk2_stone_mine', 'sea_stone_mine']);
+// Sea terrain (the game's `water` flag; rivers aren't part of it).
+const SEA = new Set(['water', 'deepwater', 'wateroil', 'gemrock', 'shipwreck']);
 
 // Effective gathering / effect radius after upgrades toggled in settings.
 export function effRadius(b, settings) {
@@ -20,9 +24,23 @@ export function waterRange(b, settings) {
   return b.waterWithin || 2;
 }
 
+// Upgrades that free buildings (game keys) from needing a road (upgrades.js TryAddEffectOfSomeUpgrades).
+export const ROAD_FREE_UPGRADES = {
+  28: ['wood_storage', 'saw_mill', 'farm', 'farm_big', 'farm_turkey', 'farm_rabbits', 'farm_pumpkin', 'heavy_lumber_mill', 'lumber_mill_drone'],
+  105: ['thermal_plant'], 407: ['toy_factory'], 358: ['super_factory', 'super_factory_2'],
+  428: ['bio_dom', 'bio_dom_big', 'bio_dom_cytrium'], 542: ['blue_purifier'], 449: ['filter_array_1'],
+  241: ['uranium_plant'], 212: ['giger_farm_1'], 468: ['titan_factory', 'titanium_storage', 'titan_factory_rift'],
+  164: ['cementaren'], 149: ['chip_factory', 'chip_factory_big', 'chip_scrap_factory'],
+  25: ['watch_tower', 'sensor_tower'], 52: ['oil_rig_ground', 'oil_storage', 'rift_miner'],
+};
+export const ADVANCED_INFRASTRUCTURE = 51; // any connected building passes its road connection on
+export const FASTER_IRON_MINES = 36;       // each iron mine can feed 2 foundries
+const owns = (settings, id) => !!settings.upgrades?.owned?.[id];
+
 export function needsRoad(b, terrainId, settings) {
   if (!b || b.road === false || b.isRoad || b.isRail) return false;
   if (b.roadlessUpg && settings.upgrades?.roadless) return false;
+  if (b.gameKey) for (const [id, keys] of Object.entries(ROAD_FREE_UPGRADES)) if (keys.includes(b.gameKey) && owns(settings, id)) return false;
   const t = catalog.tMap.get(terrainId);
   if (t?.water) return false; // water buildings connect through shipyards
   return true;
@@ -61,19 +79,36 @@ export function analyze(plan, settings) {
     list.push(i);
   }
 
-  // ----- road connectivity (BFS from settlements through roads)
+  // ----- road connectivity, as the game spreads it (road_streets.js CheckRoadConnectionRecursive):
+  // settlements and roads connect whatever touches them; a connected building passes it on to a touching
+  // building that lists it (linkFrom), to its own kind (linkSame), mine to mine (mineLink), or to any
+  // building with Advanced Infrastructure. Shipyards count as road, and shipyards and sea bridges carry it
+  // across open sea to other shipyards and bridges (sea only: rivers don't).
   let connected = null;
   if (settings.checkRoads) {
     connected = new Uint8Array(n);
+    const adv = owns(settings, ADVANCED_INFRASTRUCTURE);
+    const passes = (a, b) => adv || (b.linkFrom && a.gameKey && b.linkFrom.includes(a.gameKey))
+      || (a.linkSame && b.id === a.id) || (a.mineLink && b.mineLink);
+    const sea = (j) => SEA.has(terrain[j]);
     const q = [];
-    for (let i = 0; i < n; i++) if (T(i)?.settlement) { connected[i] = 1; q.push(i); }
+    // Start from settlements, and from mine connection origins (Premium Gold Mine, Stone Conveyor), which
+    // the game treats as connected without a road (road_streets.js mineConnectionOrigin).
+    for (let i = 0; i < n; i++) if (T(i)?.settlement || Bd(i)?.mineOrigin) { connected[i] = 1; q.push(i); }
     while (q.length) {
       const i = q.pop(); const [x, y] = xy(i);
+      const a = Bd(i);
+      const roadLike = a ? a.isRoad || a.shipyard : !sea(i);  // empty land here = settlement tile
+      const onWater = !roadLike && sea(i) && (!a || !a.isRail); // open sea (or a water building) reached by ship
       for (const [dx, dy] of N4) {
         const nx = x + dx, ny = y + dy; if (!inside(nx, ny)) continue;
         const j = idx(nx, ny); if (connected[j]) continue;
         const b = Bd(j);
-        if ((b && b.isRoad) || T(j)?.settlement) { connected[j] = 1; q.push(j); }
+        let ok;
+        if (onWater) ok = sea(j) || b?.shipyard;
+        else if (roadLike) ok = b ? !b.isRail : T(j)?.settlement || ((a?.shipyard || sea(i)) && sea(j));
+        else ok = b && !b.isRoad && !b.isRail && passes(a, b);
+        if (ok) { connected[j] = 1; q.push(j); }
       }
     }
   }
@@ -101,11 +136,7 @@ export function analyze(plan, settings) {
       if (b.pave.on === 'income') for (const k in c.income) c.income[k] = Math.round(c.income[k] * (1 + b.pave.mult));
       c.notes.push(`Pavement bonus +${Math.round(b.pave.mult * 100)}%`);
     }
-    if (connected && needsRoad(b, terrain[i], settings)) {
-      const [x, y] = xy(i);
-      const ok = N4.some(([dx, dy]) => inside(x + dx, y + dy) && connected[idx(x + dx, y + dy)]);
-      if (!ok) add(i, 'warn', `${b.name} is not connected to a settlement by road`);
-    }
+    if (connected && !connected[i] && needsRoad(b, terrain[i], settings)) add(i, 'warn', `${b.name} is not connected to a settlement by road`);
     for (const rule of b.rules || []) {
       switch (rule) {
         case 'nearWater2': {
@@ -117,7 +148,7 @@ export function analyze(plan, settings) {
           if (!ironOk.has(i)) add(i, 'bad', `${b.name} needs a Foundry within 3 tiles (or a touching mine that has one)`);
           break;
         case 'adjStoneMine':
-          if (!anyAround(i, 1, j => /stone_mine$/.test(bld[j] || '') && bld[j] !== 'sea_stone_mine')) add(i, 'warn', `${b.name} has no adjacent Stone Mine`);
+          if (!anyAround(i, 1, j => STONE_MINES.has(bld[j]))) add(i, 'warn', `${b.name} has no adjacent Stone Mine`);
           break;
         case 'adjContainer': {
           let k = 0; around(i, 1, j => { if (bld[j] === b.id) k++; });
@@ -175,8 +206,10 @@ export function analyze(plan, settings) {
     c.forests = k; c.notes.push(`${k} forest tile(s) in range`);
     if (!k) { add(i, 'bad', `${b.name} has no Forest within ${effRadius(b, settings)} tile(s)`); c.income.lumber = 0; }
   }
-  // Foundries: steel from Iron Mines in range (hybrid counts double). Each mine feeds one foundry.
-  const mineOwner = new Map();
+  // Foundries: steel from Iron Mines in range (hybrid counts double). Each mine feeds one foundry,
+  // or two with Faster Iron Mines (hrac_income_stats.js: countedBy capped at upgrade 36's value).
+  const mineCap = owns(settings, FASTER_IRON_MINES) ? 2 : 1;
+  const mineUses = new Map();
   for (const i of list) {
     const c = cells.get(i); const b = c.b;
     if (!b.foundry) continue;
@@ -184,8 +217,9 @@ export function analyze(plan, settings) {
     around(i, effRadius(b, settings) || 3, j => {
       const v = (bld[j] === 'iron_mine' || bld[j] === 'mk2_iron_mine') ? 1 : bld[j] === 'hybrid_mine' ? 2 : 0;
       if (!v) return;
-      if (mineOwner.has(j)) { shared++; return; }
-      mineOwner.set(j, i); mines += v;
+      const used = mineUses.get(j) || 0;
+      if (used >= mineCap) { shared++; return; }
+      mineUses.set(j, used + 1); mines += v;
     });
     if (shared && !mines) add(i, 'warn', `${b.name}: its iron mines already feed another foundry`);
     c.mines = mines;
@@ -195,7 +229,7 @@ export function analyze(plan, settings) {
   }
   // Stone conveyors: +200% to adjacent stone mines (no stacking).
   const boosted = new Set();
-  for (const i of list) if (cells.get(i).b.rules?.includes('adjStoneMine')) around(i, 1, j => { if (bld[j] === 'stone_mine' || bld[j] === 'mk2_stone_mine') boosted.add(j); });
+  for (const i of list) if (cells.get(i).b.rules?.includes('adjStoneMine')) around(i, 1, j => { if (STONE_MINES.has(bld[j])) boosted.add(j); });
   for (const j of boosted) { const c = cells.get(j); c.income.stone = (c.income.stone || 0) * 3; c.notes.push('Stone Conveyor adjacent: +200%'); }
   // Tankers: +100% to offshore oil rigs within range.
   const tanked = new Set();

@@ -101,12 +101,13 @@ export function gridToPlan(grid, region, buildings) {
     if (t === 'mainsettlement' || t === 'settlement' || t === 'megacity') continue; // town tiles carry their own road
     let id = null;
     for (const k in f) {
-      if (byKey.has(k) && !NOT_BUILDINGS.test(k)) { id = byKey.get(k); break; }
+      if (byKey.has(k) && !NOT_BUILDINGS.test(k) && !(k === 'rails' && f.has_street)) { id = byKey.get(k); break; }
     }
     if (!id && f.building_type && !NOT_BUILDINGS.test(f.building_type) && f.building_type !== 'mesto') {
       report.unmatched[f.building_type] = (report.unmatched[f.building_type] || 0) + 1;
     }
-    if (!id && f.rails) id = 'rail';
+    // A level crossing (rails + road on one tile) carries the road connection, so the road wins there (see above).
+    if (!id && f.rails && !f.has_street) id = 'rail';
     if (!id && f.has_street) {
       const s = f.has_street;
       id = (t === 'river' && s === 1) ? 'river_bridge' : (f.water && SEA_BRIDGES[s]) || ROAD_IDS[s] || null;

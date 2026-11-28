@@ -53,13 +53,19 @@ for (const r of mine) {
 //    so they can't be counted twice. The others come from what you own.
 const player = J(path.join(acc, 'player.json'));
 const owned = new Map(player.upgrade_levels);
+// Upgrades js/analyze.js checks by id: road exemptions (ROAD_FREE_UPGRADES), Advanced Infrastructure (51),
+// Faster Iron Mines (36).
+const CHECKED = [25, 28, 52, 105, 149, 164, 212, 241, 358, 407, 428, 449, 468, 542, 51, 36];
 const profile = {
   kind: 'post-apo-planner-profile', version: 1,
   note: 'Building values with your game upgrades applied. Personal; contains no account identifiers.',
   app_version: J(path.join(baseRaw, 'meta.json')).app_version,
   extracted: fs.statSync(path.join(acc, 'eff_tables.json')).mtime.toISOString().slice(0, 10),
   level: player.level,
-  upgrades: { advSaw: owned.has(12), roadless: owned.has(28) },
+  upgrades: {
+    advSaw: owned.has(12), roadless: owned.has(28),
+    owned: Object.fromEntries(CHECKED.filter((id) => owned.get(id) > 0).map((id) => [id, true])),
+  },
   baked: ['bigFarms', 'farmImplements', 'farmWatering'],
   buildings,
 };

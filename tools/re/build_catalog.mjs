@@ -89,6 +89,12 @@ function fromBuilding(g, FIELD_FOOD) {
     waterWithin: g.rules?.water_within || undefined,
     // Mines that pass a foundry connection on to touching mines (can_connect_to_neighbour_mine / isMineConnectionOrigin).
     mineLink: g.rules?.connects_to_neighbour_mine || g.raw?.isMineConnectionOrigin ? true : undefined,
+    // Road connection passed between touching buildings (road_streets.js CheckRoadConnectionRecursive):
+    // linkFrom = game keys whose connection this building takes on; linkSame = takes it from its own kind.
+    linkFrom: g.rules?.connects_to?.length ? g.rules.connects_to : undefined,
+    linkSame: g.rules?.connects_to_same ? true : undefined,
+    shipyard: g.raw?.is_shipyard ? true : undefined, // acts as road and links other shipyards across water
+    mineOrigin: g.raw?.isMineConnectionOrigin ? true : undefined, // connected without a road; passes it to touching mines
     unlock: g.unlock,
     // only used for buildings that are new to the planner (wiki rules/desc win when present)
     newRules: rules.length ? rules : undefined,

@@ -48,6 +48,7 @@ export function needsRoad(b, terrainId, settings) {
 
 export function analyze(plan, settings) {
   const { w, h, terrain, bld, pave } = plan;
+  const rail = plan.rail || []; // rails sharing a road tile (level crossings)
   const n = w * h;
   const T = (i) => catalog.tMap.get(terrain[i]);
   const Bd = (i) => (bld[i] ? catalog.bMap.get(bld[i]) : null);
@@ -175,7 +176,7 @@ export function analyze(plan, settings) {
           if (!anyAround(i, 1, j => terrain[j] === 'megacity' || bld[j] === 'small_suburb')) add(i, 'bad', `${b.name} must be next to a Mega City or another Suburb`);
           break;
         case 'adjRail':
-          if (!anyAround(i, 1, j => Bd(j)?.isRail)) add(i, 'warn', `${b.name} should be placed by rails`);
+          if (!anyAround(i, 1, j => Bd(j)?.isRail || rail[j])) add(i, 'warn', `${b.name} should be placed by rails`);
           break;
       }
     }
@@ -249,6 +250,12 @@ export function analyze(plan, settings) {
   }
   if (totals.uranium) totals.income.uranium = (totals.income.uranium || 0) + totals.uranium;
   for (let i = 0; i < n; i++) if (pave[i]) totals.paved++;
+  const railB = catalog.bMap.get('rail');
+  if (railB) for (let i = 0; i < n; i++) if (rail[i] && bld[i]) { // the rails of a level crossing
+    totals.poll += railB.poll || 0; totals.pollAdd += Math.max(0, railB.poll || 0);
+    for (const [k, v] of Object.entries(railB.cost || {})) if (typeof v === 'number') totals.cost[k] = (totals.cost[k] || 0) + v;
+    totals.counts.rail = (totals.counts.rail || 0) + 1;
+  }
 
   const rank = { bad: 0, warn: 1, info: 2 };
   issues.sort((a, b) => rank[a.lvl] - rank[b.lvl]);

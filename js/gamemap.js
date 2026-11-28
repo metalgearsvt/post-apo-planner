@@ -76,13 +76,13 @@ function terrainOf(f, x, y) {
  * @param grid      tiles from readGrid()
  * @param region    { cx, cy, w, h } in game coordinates (cx, cy = centre)
  * @param buildings planner catalog buildings (need .id and .gameKey)
- * @returns {{ terrain: string[], bld: (string|null)[], pave: number[], w, h, report }}
+ * @returns {{ terrain: string[], bld: (string|null)[], pave: number[], rail: number[], w, h, report }}
  */
 export function gridToPlan(grid, region, buildings) {
   const { w, h } = region;
   const gx0 = region.cx - Math.floor(w / 2), gy0 = region.cy - Math.floor(h / 2);
   const n = w * h;
-  const terrain = new Array(n).fill('unknown'), bld = new Array(n).fill(null), pave = new Array(n).fill(0);
+  const terrain = new Array(n).fill('unknown'), bld = new Array(n).fill(null), pave = new Array(n).fill(0), rail = new Array(n).fill(0);
   const byKey = new Map(), byId = new Map(buildings.map((b) => [b.id, b]));
   for (const b of buildings) if (b.gameKey && !b.gameKey.includes(':') && !byKey.has(b.gameKey)) byKey.set(b.gameKey, b.id);
   // The game drops some terrain flags once a building sits on the tile (e.g. an oil rig's oil spot).
@@ -106,7 +106,9 @@ export function gridToPlan(grid, region, buildings) {
     if (!id && f.building_type && !NOT_BUILDINGS.test(f.building_type) && f.building_type !== 'mesto') {
       report.unmatched[f.building_type] = (report.unmatched[f.building_type] || 0) + 1;
     }
-    // A level crossing (rails + road on one tile) carries the road connection, so the road wins there (see above).
+    // A level crossing (rails + road on one tile): the road goes in `bld` (it carries the road connection),
+    // the rails in the `rail` layer so the rail line stays unbroken.
+    if (f.rails && f.has_street) rail[i] = 1;
     if (!id && f.rails && !f.has_street) id = 'rail';
     if (!id && f.has_street) {
       const s = f.has_street;
@@ -123,5 +125,5 @@ export function gridToPlan(grid, region, buildings) {
     }
     bld[i] = id;
   }
-  return { terrain, bld, pave, w, h, report };
+  return { terrain, bld, pave, rail, w, h, report };
 }

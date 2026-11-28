@@ -34,7 +34,8 @@ function encodePlan(p) {
   if (prev !== null) t.push(prev, run);
   const b = []; p.bld.forEach((id, i) => { if (id) b.push([i, id]); });
   const pv = []; p.pave.forEach((v, i) => { if (v) pv.push(i); });
-  return { id: p.id, name: p.name, w: p.w, h: p.h, t, b, p: pv, updated: Date.now(), view: p.view };
+  const rx = []; p.rail.forEach((v, i) => { if (v) rx.push(i); });
+  return { id: p.id, name: p.name, w: p.w, h: p.h, t, b, p: pv, x: rx, updated: Date.now(), view: p.view };
 }
 function decodePlan(e) {
   const n = e.w * e.h;
@@ -43,11 +44,12 @@ function decodePlan(e) {
   while (k < n) terrain[k++] = 'grass';
   const bld = new Array(n).fill(null); for (const [i, id] of e.b || []) if (i < n) bld[i] = id;
   const pave = new Array(n).fill(0); for (const i of e.p || []) if (i < n) pave[i] = 1;
-  return { id: e.id, name: e.name, w: e.w, h: e.h, terrain, bld, pave, view: readJSON(LS.views, {})[e.id] || e.view };
+  const rail = new Array(n).fill(0); for (const i of e.x || []) if (i < n) rail[i] = 1;
+  return { id: e.id, name: e.name, w: e.w, h: e.h, terrain, bld, pave, rail, view: readJSON(LS.views, {})[e.id] || e.view };
 }
 function makePlan(name, w, h, fill = 'grass', withMain = true) {
   const n = w * h;
-  const p = { id: uid(), name, w, h, terrain: new Array(n).fill(fill), bld: new Array(n).fill(null), pave: new Array(n).fill(0) };
+  const p = { id: uid(), name, w, h, terrain: new Array(n).fill(fill), bld: new Array(n).fill(null), pave: new Array(n).fill(0), rail: new Array(n).fill(0) };
   if (withMain) p.terrain[((h / 2) | 0) * w + ((w / 2) | 0)] = 'mainsettlement';
   return p;
 }
@@ -130,6 +132,10 @@ function setCell(i, layer, val) {
   ovSet(i);
   return true;
 }
+// Removing the road of a level crossing leaves the rails behind.
+function removeBuilding(i) {
+  if (plan.rail[i]) { setCell(i, 'bld', 'rail'); setCell(i, 'rail', 0); } else setCell(i, 'bld', null);
+}
 function endStroke() {
   if (!stroke) return;
   const ch = [...stroke.changes.values()].filter(c => c.before !== c.after);
@@ -167,9 +173,15 @@ function applyTool(i, mode) {
   if (tool === 'terrain') setCell(i, 'terrain', selTerrain);
   else if (tool === 'build') {
     const b = catalog.bMap.get(selBuilding);
+    const cur = catalog.bMap.get(plan.bld[i]);
     if (b?.isPavement) setCell(i, 'pave', 1);
-    else setCell(i, 'bld', selBuilding);
-  } else if (tool === 'erase') { setCell(i, 'bld', null); setCell(i, 'pave', 0); }
+    // Rails and a road can share a tile (a level crossing): the road stays in `bld`, the rails go in the `rail` layer.
+    else if (b?.isRail && cur?.isRoad) setCell(i, 'rail', 1);
+    else {
+      const crossing = b?.isRoad && (cur?.isRail || (cur?.isRoad && plan.rail[i]));
+      setCell(i, 'bld', selBuilding); setCell(i, 'rail', crossing ? 1 : 0);
+    }
+  } else if (tool === 'erase') { setCell(i, 'bld', null); setCell(i, 'pave', 0); setCell(i, 'rail', 0); }
   else if (tool === 'pave') setCell(i, 'pave', mode);
 }
 
@@ -406,6 +418,27 @@ function drawTile(c, X, Y, s) {
 // Micro / Citrhodium Cleaners turn the river tile itself into a tree-lined river that follows the river's course.
 const RIVER_TREE_BUILDINGS = new Set(['microcleaner', 'citrhodiumcleaner']);
 function drawBuilding(b, i, x, y, X, Y, s, alpha, ghost = false) {
+  drawBuildingBody(b, i, x, y, X, Y, s, alpha, ghost);
+  if (b?.isRoad && !ghost && plan.rail[i]) drawRails(x, y, X, Y, s); // level crossing: rails over the road
+}
+// Rails as a brown track joining neighbouring rails (rail tiles or other crossings).
+function drawRails(x, y, X, Y, s, ghost = false) {
+  const { w, h, bld } = plan;
+  const conn = (nx, ny) => {
+    if (nx < 0 || ny < 0 || nx >= w || ny >= h) return false;
+    const j = ny * w + nx;
+    return !!catalog.bMap.get(bld[j])?.isRail || !!plan.rail[j];
+  };
+  const rw = s * 0.22, o = (s - rw) / 2;
+  ctx.fillStyle = '#5a3e2b';
+  ctx.fillRect(X + o, Y + o, rw, rw);
+  if (conn(x - 1, y) || ghost) ctx.fillRect(X, Y + o, o + 1, rw);
+  if (conn(x + 1, y) || ghost) ctx.fillRect(X + o + rw - 1, Y + o, o + 1, rw);
+  if (conn(x, y - 1)) ctx.fillRect(X + o, Y, rw, o + 1);
+  if (conn(x, y + 1)) ctx.fillRect(X + o, Y + o + rw - 1, rw, o + 1);
+  if (s >= 12) { ctx.strokeStyle = '#c9c9c9'; ctx.lineWidth = 1; ctx.strokeRect(X + o + 1, Y + o + 1, rw - 2, rw - 2); }
+}
+function drawBuildingBody(b, i, x, y, X, Y, s, alpha, ghost) {
   if (!b) { ctx.fillStyle = '#f0f'; ctx.fillRect(X + s * .2, Y + s * .2, s * .6, s * .6); return; }
   const col = bColor(b);
   const { w, h, bld, terrain } = plan;
@@ -416,22 +449,20 @@ function drawBuilding(b, i, x, y, X, Y, s, alpha, ghost = false) {
     drawTile(treeRiver, X, Y, s);
     if (b.id === 'microcleaner') return; // the tree-lined river is the whole picture; Citrhodium adds its cleaner on top
   }
-  if (b.isRoad || b.isRail) {
-    const isR = b.isRail;
+  if (b.isRail) { drawRails(x, y, X, Y, s, ghost); return; }
+  if (b.isRoad) {
     const conn = (nx, ny) => {
       if (nx < 0 || ny < 0 || nx >= w || ny >= h) return false;
-      const j = ny * w + nx; const nb = catalog.bMap.get(bld[j]);
-      if (isR) return !!nb?.isRail;
-      return roadLike(nb) || catalog.tMap.get(terrain[j])?.settlement;
+      const j = ny * w + nx;
+      return roadLike(catalog.bMap.get(bld[j])) || catalog.tMap.get(terrain[j])?.settlement;
     };
-    const rw = s * (isR ? 0.22 : 0.42), o = (s - rw) / 2;
-    ctx.fillStyle = isR ? '#5a3e2b' : (b.color || '#8a8a8a');
+    const rw = s * 0.42, o = (s - rw) / 2;
+    ctx.fillStyle = b.color || '#8a8a8a';
     ctx.fillRect(X + o, Y + o, rw, rw);
     if (conn(x - 1, y) || ghost) ctx.fillRect(X, Y + o, o + 1, rw);
     if (conn(x + 1, y) || ghost) ctx.fillRect(X + o + rw - 1, Y + o, o + 1, rw);
     if (conn(x, y - 1)) ctx.fillRect(X + o, Y, rw, o + 1);
     if (conn(x, y + 1)) ctx.fillRect(X + o, Y + o + rw - 1, rw, o + 1);
-    if (isR && s >= 12) { ctx.strokeStyle = '#c9c9c9'; ctx.lineWidth = 1; ctx.strokeRect(X + o + 1, Y + o + 1, rw - 2, rw - 2); }
     return;
   }
   const bIcon = s >= 8 && settings.useIcons ? icons.b.get(b.id) : null;
@@ -490,7 +521,7 @@ function hoverHud(i) {
   const x = i % plan.w, y = (i / plan.w) | 0;
   const t = catalog.tMap.get(plan.terrain[i]);
   const b = plan.bld[i] ? catalog.bMap.get(plan.bld[i]) : null;
-  hud(`(${x}, ${y})  ${t?.name || plan.terrain[i]}${plan.pave[i] ? ' + pavement' : ''}${b ? '\n' + b.name : ''}`);
+  hud(`(${x}, ${y})  ${t?.name || plan.terrain[i]}${plan.pave[i] ? ' + pavement' : ''}${b ? '\n' + b.name : ''}${plan.rail[i] ? ' + Rails' : ''}`);
 }
 function toast(msg, ms = 2200) {
   const el = $('#toast'); el.textContent = msg; el.hidden = false;
@@ -627,7 +658,7 @@ window.addEventListener('keydown', (e) => {
   else if (k === 'r') toggleRect();
   else if (k === 'f') fit();
   else if (k === 'escape') { selCell = -1; renderInfo(); draw(); }
-  else if (k === 'delete' || k === 'backspace') { if (selCell >= 0) { beginStroke(); setCell(selCell, 'bld', null); endStroke(); } }
+  else if (k === 'delete' || k === 'backspace') { if (selCell >= 0) { beginStroke(); removeBuilding(selCell); endStroke(); } }
 });
 window.addEventListener('keyup', (e) => { if (e.key === ' ') spaceDown = false; });
 
@@ -857,7 +888,7 @@ function renderInfo() {
   if (result?.fieldOwner.has(i)) { const o = result.fieldOwner.get(i); html += `<p class="small muted">Farm field of the farm at (${o % plan.w}, ${(o / plan.w) | 0})</p>`; }
   if (b) {
     const eff = c || {};
-    html += `<h3>${esc(b.name)} ${b.premium ? '<span style="color:#c86fe0">◆ premium</span>' : ''}</h3>
+    html += `<h3>${esc(b.name)}${plan.rail[i] ? ' + Rails' : ''} ${b.premium ? '<span style="color:#c86fe0">◆ premium</span>' : ''}</h3>
     <table class="kv">
       ${b.lvl ? `<tr><td>Unlocks</td><td class="n">Lv ${b.lvl}</td></tr>` : ''}
       ${b.cost ? `<tr><td>Cost</td><td class="n">${Object.entries(b.cost).map(([k, v]) => `${fmt(v)} ${RES_LABEL[k] || k}`).join(', ')}</td></tr>` : ''}
@@ -885,7 +916,7 @@ $('#tab-info').addEventListener('click', (e) => {
   const i = selCell, b = plan.bld[i];
   if (a === 'pick') { selBuilding = b; setTool('build'); renderPalette(); toast('Selected ' + catalog.bMap.get(b)?.name); }
   if (a === 'pickT') { selTerrain = plan.terrain[i]; setTool('terrain'); renderPalette(); toast('Selected ' + catalog.tMap.get(selTerrain)?.name); }
-  if (a === 'remove') { beginStroke(); setCell(i, 'bld', null); endStroke(); }
+  if (a === 'remove') { beginStroke(); removeBuilding(i); endStroke(); }
   if (a === 'edit') editBuildingDialog(catalog.bMap.get(b));
 });
 
@@ -1015,7 +1046,7 @@ async function resizeDialog() {
   for (let y = 0; y < plan.h; y++) for (let x = 0; x < plan.w; x++) {
     const X = x + dx, Y = y + dy; if (X < 0 || Y < 0 || X >= nw || Y >= nh) continue;
     const s = y * plan.w + x, t = Y * nw + X;
-    np.terrain[t] = plan.terrain[s]; np.bld[t] = plan.bld[s]; np.pave[t] = plan.pave[s];
+    np.terrain[t] = plan.terrain[s]; np.bld[t] = plan.bld[s]; np.pave[t] = plan.pave[s]; np.rail[t] = plan.rail[s];
   }
   plan = np; switchedPlan(true);
 }
@@ -1238,7 +1269,7 @@ async function gameMapDialog(grid, fileName) {
   const region = { cx: +v.cx | 0, cy: +v.cy | 0, w: clamp(+v.w, 3, MAX_SIDE), h: clamp(+v.h, 3, MAX_SIDE) };
   const r = gridToPlan(grid, region, catalog.buildings);
   persistPlan(true);
-  plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave };
+  plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave, rail: r.rail };
   switchedPlan(true);
   const odd = Object.entries(r.report.unmatched);
   toast(`Imported ${fmt(r.report.buildings)} buildings and ${fmt(r.report.roads)} roads` + (odd.length ? ` (${odd.length} unknown building type(s) skipped)` : ''), 5000);

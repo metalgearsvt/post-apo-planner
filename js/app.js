@@ -5,7 +5,7 @@ import {
   getProfile, profileActive, setProfile, setProfileEnabled, clearProfile,
 } from './catalog.js';
 import { analyze, effRadius, waterRange, needsRoad } from './analyze.js';
-import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack, connVariant, RIVER } from './icons.js';
+import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack, connVariant, RIVER, RIVER_TREES } from './icons.js';
 import { readGrid, gridBounds, gridToPlan } from './gamemap.js';
 
 // =====================================================================
@@ -221,7 +221,7 @@ function drawNow() {
     const col = t?.color || '#ff00ff';
     ctx.fillStyle = col; ctx.fillRect(X, Y, s + 0.5, s + 0.5);
     const tIcon = s >= 8 && settings.useIcons ? (terrain[i] === 'river' && riverSprite(x, y)) || icons.t.get(terrain[i]) : null;
-    if (tIcon) ctx.drawImage(tIcon, X, Y, s + 0.5, s + 0.5);
+    if (tIcon) drawTile(tIcon, X, Y, s);
     else if (s >= 10 && t) drawTerrainDecor(t, X, Y, s, x, y);
     if (settings.showFields && result?.fieldOwner.has(i)) {
       ctx.strokeStyle = 'rgba(240,210,90,.75)'; ctx.lineWidth = Math.max(1, s / 14);
@@ -329,8 +329,8 @@ function roadSprite(b, i, x, y) {
   return set.get(connVariant(conn(x, y - 1), conn(x, y + 1), conn(x - 1, y), conn(x + 1, y))) || set.get('11') || set.get('12') || null;
 }
 // River tiles turn toward neighbouring river or open water, like the game's RotateRiversAuto.
-function riverSprite(x, y) {
-  const set = icons.r.get(RIVER); if (!set) return null;
+function riverSprite(x, y, kind = RIVER) {
+  const set = icons.r.get(kind); if (!set) return null;
   const { w, h, terrain } = plan;
   const wet = (nx, ny) => nx >= 0 && ny >= 0 && nx < w && ny < h && !!catalog.tMap.get(terrain[ny * w + nx])?.water;
   let up = wet(x, y - 1), down = wet(x, y + 1), left = wet(x - 1, y), right = wet(x + 1, y);
@@ -339,12 +339,24 @@ function riverSprite(x, y) {
   if (x === 0 && right) left = true; if (x === w - 1 && left) right = true;
   return set.get(connVariant(up, down, left, right, true)) || null;
 }
+// Tile sprites are drawn tile-wide and bottom-aligned; taller ones (trees on river banks) stick out above the tile.
+function drawTile(c, X, Y, s) {
+  const th = s * c.height / c.width;
+  ctx.drawImage(c, X, Y + s - th, s + 0.5, th + 0.5);
+}
+// Micro / Citrhodium Cleaners turn the river tile itself into a tree-lined river that follows the river's course.
+const RIVER_TREE_BUILDINGS = new Set(['microcleaner', 'citrhodiumcleaner']);
 function drawBuilding(b, i, x, y, X, Y, s, alpha, ghost = false) {
   if (!b) { ctx.fillStyle = '#f0f'; ctx.fillRect(X + s * .2, Y + s * .2, s * .6, s * .6); return; }
   const col = bColor(b);
   const { w, h, bld, terrain } = plan;
   const rIcon = b.isRoad && s >= 8 && settings.useIcons ? roadSprite(b, i, x, y) : null;
-  if (rIcon) { ctx.drawImage(rIcon, X, Y, s + 0.5, s + 0.5); return; }
+  if (rIcon) { drawTile(rIcon, X, Y, s); return; }
+  const treeRiver = RIVER_TREE_BUILDINGS.has(b.id) && s >= 8 && settings.useIcons && plan.terrain[i] === 'river' ? riverSprite(x, y, RIVER_TREES) : null;
+  if (treeRiver) {
+    drawTile(treeRiver, X, Y, s);
+    if (b.id === 'microcleaner') return; // the tree-lined river is the whole picture; Citrhodium adds its cleaner on top
+  }
   if (b.isRoad || b.isRail) {
     const isR = b.isRail;
     const conn = (nx, ny) => {

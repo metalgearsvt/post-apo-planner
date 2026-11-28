@@ -8,7 +8,7 @@ const DB = 'pat-icons', STORE = 'pack', KEY = 'current';
 
 // id -> canvas; r: tiles that join their neighbours, road id (or RIVER) -> Map(variant -> canvas)
 export const icons = { b: new Map(), t: new Map(), r: new Map(), source: null };
-export const RIVER = 'terrain:river';
+export const RIVER = 'terrain:river', RIVER_TREES = 'terrain:river_trees';
 const urlCache = new Map();
 
 function idb(mode, fn) {
@@ -57,10 +57,12 @@ export function roadVariant(up, down, left, right) {
   return up ? (left ? '3' : '1') : (left ? '9' : '7');
 }
 
-// Road sprites are full tiles: crop them as-is (no bottom alignment).
+// Road / river sprites are full tiles, kept at their aspect ratio: taller ones (river banks with trees) stick out
+// above the tile, the way the game draws them. Draw them tile-wide and bottom-aligned (see drawTile in app.js).
 function cropTile(img, s) {
-  const c = document.createElement('canvas'); c.width = c.height = SIZE;
-  c.getContext('2d').drawImage(img, s?.x ?? 0, s?.y ?? 0, s?.w ?? img.naturalWidth, s?.h ?? img.naturalHeight, 0, 0, SIZE, SIZE);
+  const sw = s?.w ?? img.naturalWidth, sh = s?.h ?? img.naturalHeight;
+  const c = document.createElement('canvas'); c.width = SIZE; c.height = Math.round(SIZE * sh / sw);
+  c.getContext('2d').drawImage(img, s?.x ?? 0, s?.y ?? 0, sw, sh, 0, 0, c.width, c.height);
   return c;
 }
 
@@ -91,7 +93,7 @@ async function fromFolder() {
       const img = sheets.get(s.file); if (img) icons[kind].set(id, crop(img, s.x == null ? null : s));
     }
   }
-  for (const [id, vs] of [...Object.entries(m.roads || {}), [RIVER, m.river || {}]]) {
+  for (const [id, vs] of [...Object.entries(m.roads || {}), [RIVER, m.river || {}], [RIVER_TREES, m.river_trees || {}]]) {
     const out = new Map();
     for (const [v, s] of Object.entries(vs)) { const img = sheets.get(s.file); if (img) out.set(v, cropTile(img, s.x == null ? null : s)); }
     if (out.size) icons.r.set(id, out);

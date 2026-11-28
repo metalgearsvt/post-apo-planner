@@ -92,10 +92,13 @@ for (const b of BUILDINGS) {
   if (Object.keys(out).length) manifest.roads[b.id] = out;
 }
 // Rivers turn with their neighbours the same way (the game's RotateRiversAuto), plus end pieces 22/44/66/88 and a lone 13.
-manifest.river = {};
-for (const v of ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13', '22', '44', '66', '88']) {
-  const s = resolve(`rivers/river_t1_${v}`);
-  if (s) { manifest.river[v] = s; used.add(s.file); }
+// river_t2 is the tree-lined river that Micro / Citrhodium Cleaners turn a river tile into.
+for (const [key, t] of [['river', 't1'], ['river_trees', 't2']]) {
+  manifest[key] = {};
+  for (const v of ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13', '22', '44', '66', '88']) {
+    const s = resolve(`rivers/river_${t}_${v}`);
+    if (s) { manifest[key][v] = s; used.add(s.file); }
+  }
 }
 
 const terrainKeyFor = Object.fromEntries(Object.entries(TILE_TO_TERRAIN).map(([g, t]) => [t, g]));

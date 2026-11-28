@@ -12,7 +12,7 @@ import { loadPlans, savePlans, deletePlan } from './store.js';
 // =====================================================================
 // Persistence
 // =====================================================================
-const LS = { cur: 'pat.current.v1', settings: 'pat.settings.v1' };
+const LS = { cur: 'pat.current.v1', settings: 'pat.settings.v1', views: 'pat.views.v1' };
 const MAX_SIDE = 1000; // largest plan width/height
 const DEFAULT_SETTINGS = {
   level: 0, hideLocked: false, showGrid: true, showLabels: true, showFields: true, checkRoads: true,
@@ -43,7 +43,7 @@ function decodePlan(e) {
   while (k < n) terrain[k++] = 'grass';
   const bld = new Array(n).fill(null); for (const [i, id] of e.b || []) if (i < n) bld[i] = id;
   const pave = new Array(n).fill(0); for (const i of e.p || []) if (i < n) pave[i] = 1;
-  return { id: e.id, name: e.name, w: e.w, h: e.h, terrain, bld, pave, view: e.view };
+  return { id: e.id, name: e.name, w: e.w, h: e.h, terrain, bld, pave, view: readJSON(LS.views, {})[e.id] || e.view };
 }
 function makePlan(name, w, h, fill = 'grass', withMain = true) {
   const n = w * h;
@@ -68,6 +68,18 @@ function persistPlan(now = false) {
     try { localStorage.setItem(LS.cur, plan.id); } catch {}
   };
   if (now) go(); else saveTimer = setTimeout(go, 400);
+  saveView();
+}
+// Zooming and panning only change the view: keep that in a small localStorage entry instead of
+// re-saving the whole plan, which takes a noticeable moment on big maps.
+let viewTimer = 0;
+function saveView() {
+  clearTimeout(viewTimer);
+  viewTimer = setTimeout(() => {
+    plan.view = { scale: view.scale, ox: view.ox, oy: view.oy };
+    const all = readJSON(LS.views, {}); all[plan.id] = plan.view;
+    try { localStorage.setItem(LS.views, JSON.stringify(all)); localStorage.setItem(LS.cur, plan.id); } catch {}
+  }, 400);
 }
 
 // =====================================================================
@@ -98,6 +110,8 @@ function analysisSettings() {
   return { ...settings, upgrades: up };
 }
 function reanalyze() { result = analyze(plan, analysisSettings()); }
+// On big plans a full re-check on every pointer move makes painting stutter; it runs once when the stroke ends instead.
+const liveAnalysis = () => plan.w * plan.h <= 200 * 200;
 
 // =====================================================================
 // Editing + history
@@ -113,6 +127,7 @@ function setCell(i, layer, val) {
     if (ex) ex.after = val; else stroke.changes.set(key, { i, layer, before: arr[i], after: val });
   }
   arr[i] = val;
+  ovSet(i);
   return true;
 }
 function endStroke() {
@@ -127,17 +142,17 @@ function endStroke() {
 function cancelStroke() {
   if (!stroke) return;
   for (const c of stroke.changes.values()) plan[c.layer][c.i] = c.before;
-  stroke = null; changed(false);
+  stroke = null; invalidateOverview(); changed(false);
 }
 function undo() {
   const ch = undoStack.pop(); if (!ch) return;
   for (const c of ch) plan[c.layer][c.i] = c.before;
-  redoStack.push(ch); changed();
+  redoStack.push(ch); invalidateOverview(); changed();
 }
 function redo() {
   const ch = redoStack.pop(); if (!ch) return;
   for (const c of ch) plan[c.layer][c.i] = c.after;
-  undoStack.push(ch); changed();
+  undoStack.push(ch); invalidateOverview(); changed();
 }
 function changed(save = true) {
   reanalyze();
@@ -178,7 +193,7 @@ function fit() {
   view.scale = Math.max(4, Math.min(64, Math.min((r.width - pad * 2) / plan.w, (Math.max(availH, 120) - pad * 2) / plan.h)));
   view.ox = (r.width - plan.w * view.scale) / 2;
   view.oy = (Math.max(availH, 120) - plan.h * view.scale) / 2;
-  draw(); persistPlan();
+  draw(); saveView();
 }
 const cellAt = (sx, sy) => {
   const x = Math.floor((sx - view.ox) / view.scale), y = Math.floor((sy - view.oy) / view.scale);
@@ -202,6 +217,42 @@ function shade(hex, amt) {
 
 let rectPreview = null; // {a, b} cell indices
 let raf = 0;
+
+// Zoomed-out overview: the whole plan as one picture, one pixel per tile (terrain, pavement, building colour),
+// scaled up in a single drawImage. Drawing every tile and building separately is far too slow on big maps.
+const OVERVIEW_BELOW = 8; // px per tile; icons and decorations only start at 8 anyway
+let ov = null; // { plan, canvas, img, dirty }
+const rgbCache = new Map();
+function rgbOf(col) {
+  let v = rgbCache.get(col);
+  if (!v) {
+    const c = document.createElement('canvas').getContext('2d'); c.fillStyle = '#000'; c.fillStyle = col;
+    const n = parseInt(c.fillStyle.slice(1), 16) || 0; // canvas normalises any colour to #rrggbb
+    v = [n >> 16, (n >> 8) & 255, n & 255]; rgbCache.set(col, v);
+  }
+  return v;
+}
+function ovPixel(i) {
+  const b = plan.bld[i] ? catalog.bMap.get(plan.bld[i]) : null;
+  if (b) return rgbOf(b.isRail ? '#5a3e2b' : b.isRoad ? (b.color || '#8a8a8a') : bColor(b));
+  if (plan.pave[i]) return rgbOf('#cdcdc8');
+  return rgbOf(catalog.tMap.get(plan.terrain[i])?.color || '#ff00ff');
+}
+function ovSet(i) {
+  if (ov?.plan !== plan) return;
+  const [r, g, b] = ovPixel(i), d = ov.img.data, k = i * 4;
+  d[k] = r; d[k + 1] = g; d[k + 2] = b; d[k + 3] = 255; ov.dirty = true;
+}
+function overview() {
+  if (ov?.plan !== plan) {
+    const c = document.createElement('canvas'); c.width = plan.w; c.height = plan.h;
+    ov = { plan, canvas: c, img: c.getContext('2d').createImageData(plan.w, plan.h), dirty: true };
+    for (let i = 0, n = plan.w * plan.h; i < n; i++) ovSet(i);
+  }
+  if (ov.dirty) { ov.canvas.getContext('2d').putImageData(ov.img, 0, 0); ov.dirty = false; }
+  return ov.canvas;
+}
+const invalidateOverview = () => { ov = null; };
 function draw() { if (!raf) raf = requestAnimationFrame(drawNow); }
 function drawNow() {
   raf = 0;
@@ -217,7 +268,13 @@ function drawNow() {
   // map shadow
   ctx.fillStyle = '#000'; ctx.fillRect(view.ox - 2, view.oy - 2, w * s + 4, h * s + 4);
 
-  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+  const far = s < OVERVIEW_BELOW;
+  if (far) {
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(overview(), view.ox, view.oy, w * s, h * s);
+    ctx.imageSmoothingEnabled = true;
+  }
+  if (!far) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
     const i = y * w + x, t = catalog.tMap.get(terrain[i]);
     const X = px(x), Y = py(y);
     const col = t?.color || '#ff00ff';
@@ -243,13 +300,13 @@ function drawNow() {
     ctx.stroke();
   }
   // buildings
-  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+  if (!far) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
     const i = y * w + x; if (!bld[i]) continue;
     const b = catalog.bMap.get(bld[i]);
     drawBuilding(b, i, x, y, px(x), py(y), s, 1);
   }
   // issue markers
-  if (result) for (const [i, c] of result.cells) {
+  if (result && !far) for (const [i, c] of result.cells) {
     if (!c.issues.length) continue;
     const x = i % w, y = (i / w) | 0; if (x < x0 || x > x1 || y < y0 || y > y1) continue;
     const worst = c.issues.some(q => q.lvl === 'bad') ? 'bad' : c.issues.some(q => q.lvl === 'warn') ? 'warn' : null;
@@ -474,7 +531,7 @@ stage.addEventListener('pointerdown', (e) => {
   if (tool === 'pave' && i >= 0) mode = plan.pave[i] ? 0 : 1;
   gesture = { type: 'paint', last: i, mode, sx: x, sy: y };
   beginStroke();
-  if (i >= 0) { applyTool(i, mode); reanalyze(); draw(); }
+  if (i >= 0) { applyTool(i, mode); if (liveAnalysis()) reanalyze(); draw(); }
 });
 
 stage.addEventListener('pointermove', (e) => {
@@ -508,7 +565,7 @@ stage.addEventListener('pointermove', (e) => {
     const pts = lineCells(gesture.last, i, gesture.sx, gesture.sy, x, y);
     for (const c of pts) applyTool(c, gesture.mode);
     gesture.last = i; gesture.sx = x; gesture.sy = y;
-    reanalyze(); draw();
+    if (liveAnalysis()) reanalyze(); draw();
   }
 });
 
@@ -533,8 +590,8 @@ function pointerEnd(e) {
   const [x, y] = localXY(e);
   pointers.delete(e.pointerId);
   if (!gesture) return;
-  if (gesture.type === 'pinch') { if (pointers.size === 0) { gesture = null; persistPlan(); } return; }
-  if (gesture.type === 'pan') { if (gesture.tap && !gesture.moved) inspectCell(cellAt(x, y)); gesture = null; persistPlan(); return; }
+  if (gesture.type === 'pinch') { if (pointers.size === 0) { gesture = null; saveView(); } return; }
+  if (gesture.type === 'pan') { if (gesture.tap && !gesture.moved) inspectCell(cellAt(x, y)); gesture = null; saveView(); return; }
   if (gesture.type === 'tap') { inspectCell(cellAt(x, y)); gesture = null; return; }
   if (gesture.type === 'rect') {
     const { a, b } = rectPreview; rectPreview = null; hud('');
@@ -555,7 +612,7 @@ stage.addEventListener('wheel', (e) => {
   const [x, y] = localXY(e);
   if (e.ctrlKey || Math.abs(e.deltaY) >= Math.abs(e.deltaX)) zoomAt(x, y, Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)));
   else { view.ox -= e.deltaX; }
-  draw(); persistPlan();
+  draw(); saveView();
 }, { passive: false });
 
 window.addEventListener('keydown', (e) => {
@@ -1022,7 +1079,7 @@ function textToKv(s) {
   }
   return o;
 }
-function afterCatalogChange() { reanalyze(); renderPalette(); renderStats(); renderInfo(); updateChrome(); draw(); }
+function afterCatalogChange() { invalidateOverview(); reanalyze(); renderPalette(); renderStats(); renderInfo(); updateChrome(); draw(); }
 
 async function editBuildingDialog(b, backToCatalog = false) {
   const isNew = !b;

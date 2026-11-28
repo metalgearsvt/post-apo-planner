@@ -6,7 +6,9 @@
 const SIZE = 96; // px per cropped icon
 const DB = 'pat-icons', STORE = 'pack', KEY = 'current';
 
-export const icons = { b: new Map(), t: new Map(), source: null }; // id -> canvas
+// id -> canvas; r: tiles that join their neighbours, road id (or RIVER) -> Map(variant -> canvas)
+export const icons = { b: new Map(), t: new Map(), r: new Map(), source: null };
+export const RIVER = 'terrain:river';
 const urlCache = new Map();
 
 function idb(mode, fn) {
@@ -35,7 +37,32 @@ function crop(img, s) {
   return c;
 }
 
-function reset() { icons.b.clear(); icons.t.clear(); urlCache.clear(); icons.source = null; }
+function reset() { icons.b.clear(); icons.t.clear(); icons.r.clear(); urlCache.clear(); icons.source = null; }
+
+// Which road / river sprite the game draws, from which sides connect (the game's BuildStreet / RotateRiversAuto):
+//   12 = straight vertical, 11 = straight horizontal, 5 = crossing,
+//   T-junctions: 8 = no up, 6 = no right, 4 = no left, 2 = no down; corners: 1 = up+right, 3 = up+left,
+//   7 = down+right, 9 = down+left.
+// Roads use a straight piece for dead ends and lone tiles; rivers (ends = true) have end pieces:
+//   22 = up only, 88 = down only, 66 = left only, 44 = right only, 13 = none.
+export function connVariant(up, down, left, right, ends = false) {
+  if (ends && up + down + left + right <= 1) return up ? '22' : down ? '88' : left ? '66' : right ? '44' : '13';
+  return roadVariant(up, down, left, right);
+}
+export function roadVariant(up, down, left, right) {
+  if (!left && !right) return '12';
+  if (!up && !down) return '11';
+  if (up && down) return left && right ? '5' : left ? '6' : '4';
+  if (left && right) return up ? '2' : '8';
+  return up ? (left ? '3' : '1') : (left ? '9' : '7');
+}
+
+// Road sprites are full tiles: crop them as-is (no bottom alignment).
+function cropTile(img, s) {
+  const c = document.createElement('canvas'); c.width = c.height = SIZE;
+  c.getContext('2d').drawImage(img, s?.x ?? 0, s?.y ?? 0, s?.w ?? img.naturalWidth, s?.h ?? img.naturalHeight, 0, 0, SIZE, SIZE);
+  return c;
+}
 
 async function fromPack(pack, source) {
   reset();
@@ -44,6 +71,11 @@ async function fromPack(pack, source) {
       try { icons[kind].set(id, crop(await loadImg(url))); } catch { /* skip broken entry */ }
     }));
   }
+  await Promise.all(Object.entries(pack.r || {}).map(async ([id, vs]) => {
+    const m = new Map();
+    await Promise.all(Object.entries(vs).map(async ([v, url]) => { try { m.set(v, cropTile(await loadImg(url))); } catch { } }));
+    if (m.size) icons.r.set(id, m);
+  }));
   icons.source = source;
 }
 
@@ -58,6 +90,11 @@ async function fromFolder() {
     for (const [id, s] of Object.entries(m[key] || {})) {
       const img = sheets.get(s.file); if (img) icons[kind].set(id, crop(img, s.x == null ? null : s));
     }
+  }
+  for (const [id, vs] of [...Object.entries(m.roads || {}), [RIVER, m.river || {}]]) {
+    const out = new Map();
+    for (const [v, s] of Object.entries(vs)) { const img = sheets.get(s.file); if (img) out.set(v, cropTile(img, s.x == null ? null : s)); }
+    if (out.size) icons.r.set(id, out);
   }
   icons.source = 'folder';
   return icons.b.size + icons.t.size > 0;
@@ -82,14 +119,18 @@ export function iconURL(kind, id) {
 
 // A pack file holds the already-cropped icons as PNG data URLs, so it's small and self-contained.
 export function exportPack() {
-  const out = { kind: 'post-apo-planner-icons', version: 1, note: 'Game art from your own copy of the game. Personal use only; do not share.', b: {}, t: {} };
+  const out = { kind: 'post-apo-planner-icons', version: 1, note: 'Game art from your own copy of the game. Personal use only; do not share.', b: {}, t: {}, r: {} };
   for (const kind of ['b', 't']) for (const id of icons[kind].keys()) out[kind][id] = iconURL(kind, id);
+  for (const [id, vs] of icons.r) {
+    out.r[id] = {};
+    for (const [v, c] of vs) out.r[id][v] = c.toDataURL('image/png');
+  }
   return out;
 }
 
 export async function importPack(data) {
   if (!data || data.kind !== 'post-apo-planner-icons') throw new Error('Not an icon pack file');
-  await idb('readwrite', (s) => s.put({ b: data.b, t: data.t }, KEY));
+  await idb('readwrite', (s) => s.put({ b: data.b, t: data.t, r: data.r }, KEY));
   await fromPack(data, 'imported');
 }
 

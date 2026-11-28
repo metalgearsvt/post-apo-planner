@@ -4,8 +4,8 @@ import {
   deleteCustomTerrain, exportCatalog, importCatalog, resetCatalog, isDefaultBuilding,
   getProfile, profileActive, setProfile, setProfileEnabled, clearProfile,
 } from './catalog.js';
-import { analyze, effRadius, waterRange } from './analyze.js';
-import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack } from './icons.js';
+import { analyze, effRadius, waterRange, needsRoad } from './analyze.js';
+import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack, connVariant, RIVER } from './icons.js';
 import { readGrid, gridBounds, gridToPlan } from './gamemap.js';
 
 // =====================================================================
@@ -220,7 +220,7 @@ function drawNow() {
     const X = px(x), Y = py(y);
     const col = t?.color || '#ff00ff';
     ctx.fillStyle = col; ctx.fillRect(X, Y, s + 0.5, s + 0.5);
-    const tIcon = s >= 8 && settings.useIcons ? icons.t.get(terrain[i]) : null;
+    const tIcon = s >= 8 && settings.useIcons ? (terrain[i] === 'river' && riverSprite(x, y)) || icons.t.get(terrain[i]) : null;
     if (tIcon) ctx.drawImage(tIcon, X, Y, s + 0.5, s + 0.5);
     else if (s >= 10 && t) drawTerrainDecor(t, X, Y, s, x, y);
     if (settings.showFields && result?.fieldOwner.has(i)) {
@@ -306,10 +306,45 @@ function drawTerrainDecor(t, X, Y, s, x, y) {
 }
 
 function roadLike(b) { return b && (b.isRoad); }
+// Like the game, a building that needs a road hooks up to just one adjacent road: here the first of below, left, right, above.
+const ROAD_SIDES = [[0, 1], [-1, 0], [1, 0], [0, -1]];
+function buildingRoadCell(j) {
+  const { w, h, bld } = plan, x = j % w, y = (j / w) | 0;
+  for (const [dx, dy] of ROAD_SIDES) {
+    const nx = x + dx, ny = y + dy;
+    if (nx >= 0 && ny >= 0 && nx < w && ny < h && roadLike(catalog.bMap.get(bld[ny * w + nx]))) return ny * w + nx;
+  }
+  return -1;
+}
+// Game road sprite for the road at (x, y), or null when no icons are loaded for that road type.
+function roadSprite(b, i, x, y) {
+  const set = icons.r.get(b.id); if (!set) return null;
+  const { w, h, bld, terrain } = plan, st = analysisSettings();
+  const conn = (nx, ny) => {
+    if (nx < 0 || ny < 0 || nx >= w || ny >= h) return false;
+    const j = ny * w + nx, nb = catalog.bMap.get(bld[j]);
+    if (roadLike(nb) || catalog.tMap.get(terrain[j])?.settlement) return true;
+    return needsRoad(nb, terrain[j], st) && buildingRoadCell(j) === i;
+  };
+  return set.get(connVariant(conn(x, y - 1), conn(x, y + 1), conn(x - 1, y), conn(x + 1, y))) || set.get('11') || set.get('12') || null;
+}
+// River tiles turn toward neighbouring river or open water, like the game's RotateRiversAuto.
+function riverSprite(x, y) {
+  const set = icons.r.get(RIVER); if (!set) return null;
+  const { w, h, terrain } = plan;
+  const wet = (nx, ny) => nx >= 0 && ny >= 0 && nx < w && ny < h && !!catalog.tMap.get(terrain[ny * w + nx])?.water;
+  let up = wet(x, y - 1), down = wet(x, y + 1), left = wet(x - 1, y), right = wet(x + 1, y);
+  // Plans are often cut out of a bigger map: a river running into the edge keeps going off-map.
+  if (y === 0 && down) up = true; if (y === h - 1 && up) down = true;
+  if (x === 0 && right) left = true; if (x === w - 1 && left) right = true;
+  return set.get(connVariant(up, down, left, right, true)) || null;
+}
 function drawBuilding(b, i, x, y, X, Y, s, alpha, ghost = false) {
   if (!b) { ctx.fillStyle = '#f0f'; ctx.fillRect(X + s * .2, Y + s * .2, s * .6, s * .6); return; }
   const col = bColor(b);
   const { w, h, bld, terrain } = plan;
+  const rIcon = b.isRoad && s >= 8 && settings.useIcons ? roadSprite(b, i, x, y) : null;
+  if (rIcon) { ctx.drawImage(rIcon, X, Y, s + 0.5, s + 0.5); return; }
   if (b.isRoad || b.isRail) {
     const isR = b.isRail;
     const conn = (nx, ny) => {
@@ -562,11 +597,13 @@ function updateChrome() {
   $('#btnUndo').disabled = !undoStack.length;
   $('#btnRedo').disabled = !redoStack.length;
   const sw = $('#curSwatch'), nm = $('#curName');
+  const img = settings.useIcons ? (tool === 'terrain' ? iconURL('t', selTerrain) : tool === 'build' ? iconURL('b', selBuilding) : null) : null;
   if (tool === 'terrain') { const t = catalog.tMap.get(selTerrain); sw.style.background = t?.color; sw.textContent = ''; nm.textContent = t?.name || selTerrain; }
-  else if (tool === 'build') { const b = catalog.bMap.get(selBuilding); sw.style.background = b ? bColor(b) : '#888'; sw.style.color = b && lum(bColor(b)) > .55 ? '#111' : '#fff'; sw.textContent = b ? abbr(b) : ''; nm.textContent = b?.name || '—'; }
+  else if (tool === 'build') { const b = catalog.bMap.get(selBuilding); sw.style.background = b ? bColor(b) : '#888'; sw.style.color = b && lum(bColor(b)) > .55 ? '#111' : '#fff'; sw.textContent = b && !img ? abbr(b) : ''; nm.textContent = b?.name || '—'; }
   else if (tool === 'pave') { sw.style.background = '#cdcdc8'; sw.textContent = ''; nm.textContent = 'Pavement'; }
   else if (tool === 'erase') { sw.style.background = '#3a1d1b'; sw.textContent = '⌫'; sw.style.color = '#fff'; nm.textContent = 'Erase'; }
   else { sw.style.background = '#333'; sw.textContent = ''; nm.textContent = tool === 'pan' ? 'Pan (tap = inspect)' : 'Inspect'; }
+  sw.style.backgroundImage = img ? `url(${img})` : ''; sw.style.backgroundSize = 'cover';
 }
 
 // Panel (sidebar on desktop, bottom sheet on mobile)
@@ -1057,21 +1094,21 @@ async function iconsDialog() {
       ...(n ? [{ label: 'Export icon pack', value: 'export', novalidate: true }] : []),
       ...(icons.source === 'imported' ? [{ label: 'Remove imported pack', value: 'remove', cls: 'btn-danger', novalidate: true }] : []),
       { label: 'Done', cls: 'btn-primary', value: 'done' },
-    ], (d, f) => f.use.addEventListener('change', () => { settings.useIcons = f.use.checked; saveSettings(); renderPalette(); draw(); }));
+    ], (d, f) => f.use.addEventListener('change', () => { settings.useIcons = f.use.checked; saveSettings(); renderPalette(); updateChrome(); draw(); }));
   if (v === 'import') $('#iconImport').click();
   if (v === 'export') {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(exportPack())], { type: 'application/json' }));
     a.download = 'post-apo-icon-pack.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
-  if (v === 'remove') { await removeImportedPack(); renderPalette(); draw(); toast('Imported icon pack removed'); }
+  if (v === 'remove') { await removeImportedPack(); renderPalette(); updateChrome(); draw(); toast('Imported icon pack removed'); }
 }
 {
   const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json'; inp.id = 'iconImport'; inp.hidden = true;
   document.body.appendChild(inp);
   inp.addEventListener('change', async () => {
     const f = inp.files[0]; inp.value = ''; if (!f) return;
-    try { await importPack(JSON.parse(await f.text())); renderPalette(); draw(); toast(`Icon pack imported (${icons.b.size + icons.t.size} icons)`); }
+    try { await importPack(JSON.parse(await f.text())); renderPalette(); updateChrome(); draw(); toast(`Icon pack imported (${icons.b.size + icons.t.size} icons)`); }
     catch (err) { alert('Icon import failed: ' + err.message); }
   });
 }
@@ -1234,7 +1271,7 @@ if (isMobile()) closePanel();
 if (plan.view) Object.assign(view, plan.view); else needFit = true;
 new ResizeObserver(resizeCanvas).observe(stage);
 resizeCanvas();
-loadIcons().then((src) => { if (src) { renderPalette(); draw(); } });
+loadIcons().then((src) => { if (src) { renderPalette(); updateChrome(); draw(); } });
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});

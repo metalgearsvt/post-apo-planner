@@ -1,5 +1,5 @@
 // Offline support: serve the app shell from cache, refresh it in the background.
-const CACHE = 'pa-planner-v7';
+const CACHE = 'pa-planner-v8';
 const SHELL = [
   './', 'index.html', 'css/style.css', 'js/app.js', 'js/data.js', 'js/data_wiki.js', 'js/gamedata.js', 'js/catalog.js', 'js/icons.js', 'js/gamemap.js', 'js/analyze.js',
   'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',

@@ -76,6 +76,28 @@ for (const b of BUILDINGS) {
   const s = resolve(name);
   if (s) { manifest.buildings[b.id] = s; used.add(s.file); } else missing.buildings.push(`${b.id}(${name || '?'})`);
 }
+// Roads join their neighbours: the game picks one of 11 sprites per road type (streets/street_t<N>_<variant>)
+// from which sides connect, see roadVariant() in js/icons.js. Bridges only have straight sprites (11 / 12).
+manifest.roads = {};
+for (const b of BUILDINGS) {
+  const m = /^road_(\d+)_notsaved(?::(\w+))?$/.exec(b.gameKey || '');
+  if (!m) continue;
+  const [, n, place] = m, out = {};
+  const variants = place ? ['11', '12'] : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12'];
+  for (const v of variants) {
+    const base = `streets/street_t${n}_${v}`;
+    const s = place === 'sea' ? resolve(`${base}_bridge_big`) || resolve(`${base}_bridge`) : place ? resolve(`${base}_bridge`) : resolve(base);
+    if (s) { out[v] = s; used.add(s.file); }
+  }
+  if (Object.keys(out).length) manifest.roads[b.id] = out;
+}
+// Rivers turn with their neighbours the same way (the game's RotateRiversAuto), plus end pieces 22/44/66/88 and a lone 13.
+manifest.river = {};
+for (const v of ['1', '2', '3', '4', '5', '6', '7', '8', '9', '11', '12', '13', '22', '44', '66', '88']) {
+  const s = resolve(`rivers/river_t1_${v}`);
+  if (s) { manifest.river[v] = s; used.add(s.file); }
+}
+
 const terrainKeyFor = Object.fromEntries(Object.entries(TILE_TO_TERRAIN).map(([g, t]) => [t, g]));
 for (const t of TERRAIN) {
   const name = PLANNER_TERRAIN_IMAGES[t.id] || terrainImage[terrainKeyFor[t.id]] || terrainKeyFor[t.id];
@@ -91,5 +113,6 @@ for (const f of used) {
 manifest.files = [...used];
 fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 1));
 console.log(`icons: ${Object.keys(manifest.buildings).length}/${BUILDINGS.length} buildings, ${Object.keys(manifest.terrain).length}/${TERRAIN.length} terrain, ${used.size} image files`);
+console.log(`road sprites: ${Object.keys(manifest.roads).length} road types, river sprites: ${Object.keys(manifest.river).length}`);
 console.log('no image for buildings:', missing.buildings.join(' ') || 'none');
 console.log('no image for terrain:', missing.terrain.join(' ') || 'none');

@@ -7,11 +7,13 @@ import {
 import { analyze, effRadius, waterRange, needsRoad } from './analyze.js';
 import { icons, loadIcons, iconURL, exportPack, importPack, removeImportedPack, connVariant, RIVER, RIVER_TREES } from './icons.js';
 import { readGrid, gridBounds, gridToPlan } from './gamemap.js';
+import { loadPlans, savePlans, deletePlan } from './store.js';
 
 // =====================================================================
 // Persistence
 // =====================================================================
-const LS = { plans: 'pat.plans.v1', cur: 'pat.current.v1', settings: 'pat.settings.v1' };
+const LS = { cur: 'pat.current.v1', settings: 'pat.settings.v1' };
+const MAX_SIDE = 1000; // largest plan width/height
 const DEFAULT_SETTINGS = {
   level: 0, hideLocked: false, showGrid: true, showLabels: true, showFields: true, checkRoads: true,
   upgrades: { bigFarms: false, farmImplements: false, advSaw: false, roadless: false, farmWatering: false },
@@ -22,7 +24,8 @@ let settings = { ...DEFAULT_SETTINGS, ...readJSON(LS.settings, {}) };
 settings.upgrades = { ...DEFAULT_SETTINGS.upgrades, ...(settings.upgrades || {}) };
 const saveSettings = () => localStorage.setItem(LS.settings, JSON.stringify(settings));
 
-let plans = readJSON(LS.plans, {}); // id -> encoded plan
+const plans = await loadPlans(); // id -> encoded plan (IndexedDB, see store.js)
+const storePlans = (...list) => savePlans(...list).catch((e) => { console.error('Saving plans failed', e); toast('Could not save — storage full?'); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 function encodePlan(p) {
@@ -61,9 +64,8 @@ function persistPlan(now = false) {
   clearTimeout(saveTimer);
   const go = () => {
     plan.view = { scale: view.scale, ox: view.ox, oy: view.oy };
-    plans[plan.id] = encodePlan(plan);
-    try { localStorage.setItem(LS.plans, JSON.stringify(plans)); localStorage.setItem(LS.cur, plan.id); }
-    catch (e) { toast('Could not save — storage full?'); }
+    storePlans(encodePlan(plan));
+    try { localStorage.setItem(LS.cur, plan.id); } catch {}
   };
   if (now) go(); else saveTimer = setTimeout(go, 400);
 }
@@ -887,14 +889,14 @@ function terrainOptions(sel) { return catalog.terrain.map(t => `<option value="$
 async function newPlanDialog() {
   const v = await modal('New plan', `
     <label class="f">Name<input name="name" required value="Plan ${Object.keys(plans).length + 1}"></label>
-    <div class="two"><label class="f">Width (tiles)<input name="w" type="number" min="3" max="200" value="25" required></label>
-    <label class="f">Height (tiles)<input name="h" type="number" min="3" max="200" value="25" required></label></div>
+    <div class="two"><label class="f">Width (tiles)<input name="w" type="number" min="3" max="${MAX_SIDE}" value="25" required></label>
+    <label class="f">Height (tiles)<input name="h" type="number" min="3" max="${MAX_SIDE}" value="25" required></label></div>
     <label class="f">Fill with<select name="fill">${terrainOptions('grass')}</select></label>
     <label class="chk" style="font-size:13px"><input type="checkbox" name="main" checked> Put a Main Settlement in the centre</label>
     <p class="note">Tip: copy the area around your settlement from the game — paint the terrain first, then plan buildings on top.</p>`,
     [{ label: 'Cancel', value: null, novalidate: true }, { label: 'Create', cls: 'btn-primary', collect: (f) => Object.fromEntries(new FormData(f)) }]);
   if (!v) return;
-  const w = clamp(+v.w, 3, 200), h = clamp(+v.h, 3, 200);
+  const w = clamp(+v.w, 3, MAX_SIDE), h = clamp(+v.h, 3, MAX_SIDE);
   persistPlan(true);
   plan = makePlan(v.name || 'Plan', w, h, v.fill, !!v.main);
   switchedPlan(true);
@@ -924,11 +926,11 @@ async function plansDialog() {
       const btn = e.target.closest('button[data-a]'); if (!btn) return;
       const id = btn.dataset.id, a = btn.dataset.a;
       if (a === 'open') { persistPlan(true); plan = decodePlan(plans[id]); switchedPlan(); close(); }
-      if (a === 'ren') { const n = prompt('Plan name', plans[id].name); if (n) { plans[id].name = n; if (id === plan.id) plan.name = n; localStorage.setItem(LS.plans, JSON.stringify(plans)); updateChrome(); d.querySelector('#planRows').innerHTML = rows(); } }
-      if (a === 'dup') { const c = { ...JSON.parse(JSON.stringify(plans[id])), id: uid(), name: plans[id].name + ' (copy)', updated: Date.now() }; plans[c.id] = c; localStorage.setItem(LS.plans, JSON.stringify(plans)); d.querySelector('#planRows').innerHTML = rows(); }
+      if (a === 'ren') { const n = prompt('Plan name', plans[id].name); if (n) { plans[id].name = n; if (id === plan.id) plan.name = n; storePlans(plans[id]); updateChrome(); d.querySelector('#planRows').innerHTML = rows(); } }
+      if (a === 'dup') { const c = { ...JSON.parse(JSON.stringify(plans[id])), id: uid(), name: plans[id].name + ' (copy)', updated: Date.now() }; storePlans(c); d.querySelector('#planRows').innerHTML = rows(); }
       if (a === 'del') {
         if (!confirm(`Delete "${plans[id].name}"? This can't be undone.`)) return;
-        delete plans[id]; localStorage.setItem(LS.plans, JSON.stringify(plans));
+        deletePlan(id).catch((e) => { console.error(e); toast('Could not delete the saved plan'); });
         if (id === plan.id) {
           const rest = Object.values(plans).sort((a, b) => b.updated - a.updated);
           plan = rest.length ? decodePlan(rest[0]) : makePlan('My base', 25, 25); switchedPlan();
@@ -941,15 +943,15 @@ async function plansDialog() {
 
 async function resizeDialog() {
   const v = await modal('Resize grid', `
-    <div class="two"><label class="f">Width<input name="w" type="number" min="3" max="200" value="${plan.w}" required></label>
-    <label class="f">Height<input name="h" type="number" min="3" max="200" value="${plan.h}" required></label></div>
+    <div class="two"><label class="f">Width<input name="w" type="number" min="3" max="${MAX_SIDE}" value="${plan.w}" required></label>
+    <label class="f">Height<input name="h" type="number" min="3" max="${MAX_SIDE}" value="${plan.h}" required></label></div>
     <label class="f">Keep existing content anchored at<select name="anchor">
       <option value="c">Centre</option><option value="tl">Top-left</option><option value="tr">Top-right</option><option value="bl">Bottom-left</option><option value="br">Bottom-right</option></select></label>
     <label class="f">Fill new tiles with<select name="fill">${terrainOptions('grass')}</select></label>
     <p class="note">Shrinking removes anything outside the new size.</p>`,
     [{ label: 'Cancel', value: null, novalidate: true }, { label: 'Resize', cls: 'btn-primary', collect: (f) => Object.fromEntries(new FormData(f)) }]);
   if (!v) return;
-  const nw = clamp(+v.w, 3, 200), nh = clamp(+v.h, 3, 200);
+  const nw = clamp(+v.w, 3, MAX_SIDE), nh = clamp(+v.h, 3, MAX_SIDE);
   const dx = v.anchor === 'c' ? Math.floor((nw - plan.w) / 2) : v.anchor.includes('r') ? nw - plan.w : 0;
   const dy = v.anchor === 'c' ? Math.floor((nh - plan.h) / 2) : v.anchor.includes('b') ? nh - plan.h : 0;
   const np = makePlan(plan.name, nw, nh, v.fill, false); np.id = plan.id;
@@ -1160,18 +1162,28 @@ async function profileDialog() {
 // ----- game map import (a map exported from the running game, see tools/re/README.md)
 async function gameMapDialog(grid, fileName) {
   const B = gridBounds(grid);
+  const fits = B.w <= MAX_SIDE && B.h <= MAX_SIDE;
   const v = await modal('Import game map', `
     <p class="small">${fmt(B.tiles)} explored tiles, ${fmt(B.buildings)} buildings. Map spans x ${B.x0}…${B.x1}, y ${B.y0}…${B.y1};
       your main settlement is at (0, 0).</p>
-    <p class="note">Plans are at most 200 × 200 tiles, so pick the area to bring in. Unexplored tiles become "Unexplored".</p>
     <label class="f">Plan name<input name="name" required value="${esc(fileName.replace(/\.json$/i, '') || 'Game map')}"></label>
+    <label class="chk" style="font-size:14px"><input type="checkbox" name="whole" ${fits ? 'checked' : 'disabled'}> Import the whole map (${fmt(B.w)} × ${fmt(B.h)} tiles)</label>
+    <p class="note">${fits ? 'Or untick it to bring in only an area.' : `Plans are at most ${MAX_SIDE} × ${MAX_SIDE} tiles, so pick the area to bring in.`}
+      Unexplored tiles become "Unexplored".</p>
     <div class="two"><label class="f">Centre x<input name="cx" type="number" value="0" required></label>
     <label class="f">Centre y<input name="cy" type="number" value="0" required></label></div>
-    <div class="two"><label class="f">Width (tiles)<input name="w" type="number" min="3" max="200" value="${Math.min(200, B.w)}" required></label>
-    <label class="f">Height (tiles)<input name="h" type="number" min="3" max="200" value="${Math.min(200, B.h)}" required></label></div>`,
-    [{ label: 'Cancel', value: null, novalidate: true }, { label: 'Create plan', cls: 'btn-primary', collect: (f) => Object.fromEntries(new FormData(f)) }]);
+    <div class="two"><label class="f">Width (tiles)<input name="w" type="number" min="3" max="${MAX_SIDE}" value="${Math.min(MAX_SIDE, B.w)}" required></label>
+    <label class="f">Height (tiles)<input name="h" type="number" min="3" max="${MAX_SIDE}" value="${Math.min(MAX_SIDE, B.h)}" required></label></div>`,
+    [{ label: 'Cancel', value: null, novalidate: true }, { label: 'Create plan', cls: 'btn-primary', collect: (f) => Object.fromEntries(new FormData(f)) }],
+    (d, f) => {
+      const area = ['cx', 'cy', 'w', 'h'].map((n) => f[n]);
+      const sync = () => area.forEach((el) => { el.disabled = f.whole.checked; });
+      f.whole.addEventListener('change', sync); sync();
+    });
   if (!v) return;
-  const region = { cx: +v.cx | 0, cy: +v.cy | 0, w: clamp(+v.w, 3, 200), h: clamp(+v.h, 3, 200) };
+  const region = v.whole
+    ? { cx: B.x0 + Math.floor(B.w / 2), cy: B.y0 + Math.floor(B.h / 2), w: B.w, h: B.h }
+    : { cx: +v.cx | 0, cy: +v.cy | 0, w: clamp(+v.w, 3, MAX_SIDE), h: clamp(+v.h, 3, MAX_SIDE) };
   const r = gridToPlan(grid, region, catalog.buildings);
   persistPlan(true);
   plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave };
@@ -1207,13 +1219,14 @@ function exportFile(all) {
 function importBundle(data) {
   if (!data || data.app !== 'post-apo-planner' || !Array.isArray(data.plans)) throw new Error('Not a planner file');
   if (data.catalog) importCatalog(data.catalog, true);
-  let last = null;
+  const added = [];
   for (const p of data.plans) {
     const e = { ...p };
     if (plans[e.id]) { e.id = uid(); e.name += ' (imported)'; }
-    e.updated = Date.now(); plans[e.id] = e; last = e;
+    e.updated = Date.now(); plans[e.id] = e; added.push(e);
   }
-  localStorage.setItem(LS.plans, JSON.stringify(plans));
+  storePlans(...added);
+  const last = added.at(-1);
   if (last) { plan = decodePlan(last); afterCatalogChange(); switchedPlan(); }
   toast(`Imported ${data.plans.length} plan(s)`);
 }
@@ -1291,6 +1304,8 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 
 // Ask the browser not to auto-clear our saved plans when the device is low on space.
 navigator.storage?.persist?.().catch(() => {});
+// Write any pending change straight away when the tab is hidden or closed (saves are otherwise delayed a little).
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && saveTimer) persistPlan(true); });
 
 // Gentle backup reminder: plans live only on this device, so nudge for a backup file
 // every couple of weeks once there's real work saved (at most once a week).

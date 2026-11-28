@@ -8,7 +8,7 @@ home screen, and works offline. There's no build step — plain HTML/CSS/JS.
 
 ## Features
 
-- **Configurable grid** (3–200 tiles per side), resize with anchoring, multiple saved plans.
+- **Configurable grid** (3–1000 tiles per side), resize with anchoring, multiple saved plans.
 - **Preloaded catalog** of 165 buildings, roads and forests and ~40 terrain tiles, read from the game itself
   (level, cost, power, pollution, income, storage, allowed tiles, radius), with the community wiki as a fallback.
 - **Placement checks**: wrong tile type, Coal Plant within 2 of water, Iron Mine needs a Foundry within 3,
@@ -22,7 +22,7 @@ home screen, and works offline. There's no build step — plain HTML/CSS/JS.
 - **Your account values (optional)**: Menu → My account values… loads a profile of the building values your
   upgrades produce, so production, power, pollution, costs, ranges and storage match your game.
 - **Import your game map**: Menu → Import game map… turns a map exported from the game into a plan
-  (up to 200 × 200 tiles around any point, buildings, roads, rails and pavement included).
+  (the whole map, or any area of it up to 1000 × 1000 tiles; buildings, roads, rails and pavement included).
 - **Phone ↔ desktop**: share codes (copy/paste text) or export/import JSON files.
 - Touch: pinch to zoom, drag to paint, a Pan tool for one-finger moving. Desktop: wheel zoom and keyboard shortcuts.
 
@@ -44,7 +44,7 @@ Any static host works. With GitHub Pages:
 2. Repository → Settings → Pages → Deploy from branch → `main` / root.
 3. Open `https://<user>.github.io/<repo>/` on your phone → browser menu → **Install app** / **Add to Home screen**.
 
-Your plans are stored in each browser's local storage, not on the server. Use share codes or
+Your plans are stored in each browser's IndexedDB (plans saved by older versions in local storage move over automatically), not on the server. Use share codes or
 exported files to move them between devices.
 
 ## Project layout
@@ -58,6 +58,7 @@ js/data_wiki.js       wiki catalog: fallback values, planner rules and notes (pl
 js/catalog.js         merges defaults with user edits
 js/icons.js           optional game icons (local folder or imported pack)
 js/gamemap.js         converts an exported game map into a plan
+js/store.js           saved plans (IndexedDB, localStorage fallback)
 js/analyze.js         placement rules and totals
 js/app.js             canvas rendering, input, UI, dialogs
 sw.js                 offline cache

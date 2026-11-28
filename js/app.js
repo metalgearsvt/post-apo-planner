@@ -1163,27 +1163,22 @@ async function profileDialog() {
 async function gameMapDialog(grid, fileName) {
   const B = gridBounds(grid);
   const fits = B.w <= MAX_SIDE && B.h <= MAX_SIDE;
+  // Pre-filled with the whole map; a map larger than the plan limit starts centred on the main settlement.
+  const W = Math.min(MAX_SIDE, B.w), H = Math.min(MAX_SIDE, B.h);
+  const CX = fits ? B.x0 + Math.floor(B.w / 2) : 0, CY = fits ? B.y0 + Math.floor(B.h / 2) : 0;
   const v = await modal('Import game map', `
-    <p class="small">${fmt(B.tiles)} explored tiles, ${fmt(B.buildings)} buildings. Map spans x ${B.x0}…${B.x1}, y ${B.y0}…${B.y1};
-      your main settlement is at (0, 0).</p>
+    <p class="small">${fmt(B.tiles)} explored tiles, ${fmt(B.buildings)} buildings. Map spans x ${B.x0}…${B.x1}, y ${B.y0}…${B.y1}
+      (${fmt(B.w)} × ${fmt(B.h)} tiles); your main settlement is at (0, 0).</p>
+    <p class="note">${fits ? 'Filled in with the whole map. Change the centre or size to bring in only an area.'
+      : `Plans are at most ${MAX_SIDE} × ${MAX_SIDE} tiles, so pick the area to bring in.`} Unexplored tiles become "Unexplored".</p>
     <label class="f">Plan name<input name="name" required value="${esc(fileName.replace(/\.json$/i, '') || 'Game map')}"></label>
-    <label class="chk" style="font-size:14px"><input type="checkbox" name="whole" ${fits ? 'checked' : 'disabled'}> Import the whole map (${fmt(B.w)} × ${fmt(B.h)} tiles)</label>
-    <p class="note">${fits ? 'Or untick it to bring in only an area.' : `Plans are at most ${MAX_SIDE} × ${MAX_SIDE} tiles, so pick the area to bring in.`}
-      Unexplored tiles become "Unexplored".</p>
-    <div class="two"><label class="f">Centre x<input name="cx" type="number" value="0" required></label>
-    <label class="f">Centre y<input name="cy" type="number" value="0" required></label></div>
-    <div class="two"><label class="f">Width (tiles)<input name="w" type="number" min="3" max="${MAX_SIDE}" value="${Math.min(MAX_SIDE, B.w)}" required></label>
-    <label class="f">Height (tiles)<input name="h" type="number" min="3" max="${MAX_SIDE}" value="${Math.min(MAX_SIDE, B.h)}" required></label></div>`,
-    [{ label: 'Cancel', value: null, novalidate: true }, { label: 'Create plan', cls: 'btn-primary', collect: (f) => Object.fromEntries(new FormData(f)) }],
-    (d, f) => {
-      const area = ['cx', 'cy', 'w', 'h'].map((n) => f[n]);
-      const sync = () => area.forEach((el) => { el.disabled = f.whole.checked; });
-      f.whole.addEventListener('change', sync); sync();
-    });
+    <div class="two"><label class="f">Centre x<input name="cx" type="number" value="${CX}" required></label>
+    <label class="f">Centre y<input name="cy" type="number" value="${CY}" required></label></div>
+    <div class="two"><label class="f">Width (tiles)<input name="w" type="number" min="3" max="${MAX_SIDE}" value="${W}" required></label>
+    <label class="f">Height (tiles)<input name="h" type="number" min="3" max="${MAX_SIDE}" value="${H}" required></label></div>`,
+    [{ label: 'Cancel', value: null, novalidate: true }, { label: 'Create plan', cls: 'btn-primary', collect: (f) => Object.fromEntries(new FormData(f)) }]);
   if (!v) return;
-  const region = v.whole
-    ? { cx: B.x0 + Math.floor(B.w / 2), cy: B.y0 + Math.floor(B.h / 2), w: B.w, h: B.h }
-    : { cx: +v.cx | 0, cy: +v.cy | 0, w: clamp(+v.w, 3, MAX_SIDE), h: clamp(+v.h, 3, MAX_SIDE) };
+  const region = { cx: +v.cx | 0, cy: +v.cy | 0, w: clamp(+v.w, 3, MAX_SIDE), h: clamp(+v.h, 3, MAX_SIDE) };
   const r = gridToPlan(grid, region, catalog.buildings);
   persistPlan(true);
   plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave };

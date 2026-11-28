@@ -76,13 +76,16 @@ function terrainOf(f, x, y) {
  * @param grid      tiles from readGrid()
  * @param region    { cx, cy, w, h } in game coordinates (cx, cy = centre)
  * @param buildings planner catalog buildings (need .id and .gameKey)
- * @returns {{ terrain: string[], bld: (string|null)[], pave: number[], rail: number[], w, h, report }}
+ * @returns {{ terrain: string[], bld: (string|null)[], pave: number[], rail: number[], forest: number[], town: number[], w, h, report }}
+ *   forest = forest level on the tile (the game's `forest` flag, 1-6; it lowers pollution by that much),
+ *   town   = town level on settlement tiles (the game's `mesto`; towns past level 20 pollute).
  */
 export function gridToPlan(grid, region, buildings) {
   const { w, h } = region;
   const gx0 = region.cx - Math.floor(w / 2), gy0 = region.cy - Math.floor(h / 2);
   const n = w * h;
   const terrain = new Array(n).fill('unknown'), bld = new Array(n).fill(null), pave = new Array(n).fill(0), rail = new Array(n).fill(0);
+  const forest = new Array(n).fill(0), town = new Array(n).fill(0);
   const byKey = new Map(), byId = new Map(buildings.map((b) => [b.id, b]));
   for (const b of buildings) if (b.gameKey && !b.gameKey.includes(':') && !byKey.has(b.gameKey)) byKey.set(b.gameKey, b.id);
   // The game drops some terrain flags once a building sits on the tile (e.g. an oil rig's oil spot).
@@ -98,6 +101,9 @@ export function gridToPlan(grid, region, buildings) {
     const t = terrainOf(f, x, y);
     terrain[i] = t;
     if (f.pavement || f.pavement_w) pave[i] = 1;
+    // Uranium clouds stop a forest from cleaning (hrac_income_stats.js).
+    if (f.forest && !f.uranium_cloud) forest[i] = +f.forest || 1;
+    if (f.mesto) town[i] = +f.mesto || 0;
     if (t === 'mainsettlement' || t === 'settlement' || t === 'megacity') continue; // town tiles carry their own road
     let id = null;
     for (const k in f) {
@@ -125,5 +131,5 @@ export function gridToPlan(grid, region, buildings) {
     }
     bld[i] = id;
   }
-  return { terrain, bld, pave, rail, w, h, report };
+  return { terrain, bld, pave, rail, forest, town, w, h, report };
 }

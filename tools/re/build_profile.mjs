@@ -49,6 +49,42 @@ for (const r of mine) {
   if (Object.keys(o).length) buildings[r.id] = o;
 }
 
+// Pollution that depends on the account rather than the map (hrac_income_stats.js, end of the income pass),
+// plus the upgrade factors js/analyze.js needs for the map terms (towns, farm fields, Trees of Life).
+function accountPollution(h, owned) {
+  const upgrades = J('data/game/upgrades.json').data;
+  const val = (id) => (owned.get(id) || 0) * (upgrades.find((u) => u.id === id)?.value || 0); // GetPlayerUpgradeValue
+  const st = h.stats || {};
+  const removeWaterOil = J(path.join(baseRaw, 'tables.json')).BUILDINGS.find((b) => b.grid_key === 'remove_water_oil_notsaved')?.polution ?? -45;
+  const expand = J(path.join(baseRaw, 'tables.json')).EXPAND_RULES || [];
+  const parts = [
+    ['Base pollution', 100000 + 5],                                              // BASE_POLLUTION + BASE_POLLUTION_start
+    ['Map expansions', expand.filter((e) => h.map_size >= e.map_size).reduce((s, e) => s + e.pollution, 0)],
+    ['Pollution Purifier upgrades', -(val(464) + val(465) + val(585))],
+    ['Nuked experiments', ((st.number_of_experiements_nuked || 0) - (st.number_of_experiements_cleared || 0)) * 500],
+    ['Rockets sent', -(h.rocket_types_sent?.[1] || 0) * 1000],
+    ['Anti-pollution (offers, rewards)', -(h.anti_pollution || 0) - (h.bonus_pollution || 0)],
+    ['Cleared broken power lines', -(st.cleared_broken_power || 0) * 20],
+    ['Uranium barrels cleared', -(st.uranium_barrels_polution_bonus || 0) - (st.special_uranium_cleared || 0)
+      - (st.water_barrels_cleared || 0) * 20 - (st.uran_lakes_cleared || 0) * 100],
+    ['Ground oil removed / added', ((st.new_ground_oil || 0) - (st.ground_oil_removal || 0)) * 5],
+    ['Sea oil removed / added', ((st.removed_water_oils || 0) - (st.created_water_oils || 0)) * removeWaterOil],
+  ];
+  // Thanksgiving (6) / Rabbits (10): each event field cleans by upgrade 200's value while the event runs.
+  if ([6, 10].includes(h.event_last_event_type) && h.event_tracking_data_2) {
+    parts.push(['Event fields (until the event ends)', -h.event_tracking_data_2 * val(200)]);
+  }
+  const kept = parts.filter(([, v]) => v);
+  return {
+    account: kept.reduce((s, [, v]) => s + v, 0),
+    parts: kept,
+    townFactor: (1 - 0.01 * val(66)) * (1 - 0.01 * val(285)) * (1 - 0.01 * val(555)), // Town Cleaner upgrades
+    fieldBonus: owned.get(200) ? val(200) : 0,                                     // Stop Burping, Cows
+    forestBonusPct: Math.min(16, h.buildings?.tree_of_life_1 || 0),                // Trees of Life, MAX_TREES_OF_LIFE
+    gameTotal: h.real_polution,                                                    // what the game showed, for comparison
+  };
+}
+
 // 3. Planner upgrade toggles. Effects already in the numbers above are "baked" and the toggles are ignored,
 //    so they can't be counted twice. The others come from what you own.
 const player = J(path.join(acc, 'player.json'));
@@ -67,6 +103,7 @@ const profile = {
     owned: Object.fromEntries(CHECKED.filter((id) => owned.get(id) > 0).map((id) => [id, true])),
   },
   baked: ['bigFarms', 'farmImplements', 'farmWatering'],
+  pollution: accountPollution(player.player, owned),
   buildings,
 };
 fs.writeFileSync(path.join(acc, 'profile.json'), JSON.stringify(profile, null, 1));

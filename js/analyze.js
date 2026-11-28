@@ -46,6 +46,17 @@ export function needsRoad(b, terrainId, settings) {
   return true;
 }
 
+const DEEP_WATER_POLLUTION = 2;   // ships.js
+const REQ_ELECTRICITY_LEVEL = 20; // town_levels_config.js: towns pollute past this level
+const MEGA_CITY_FOG_LEVEL = 116;  // mega_town_cities.js
+// pollution_clear_purifier.js GetTownPollutionByLevel. `factor` = the Town Cleaner upgrades (from the profile).
+export function townPollution(level, mega, factor = 1) {
+  if (level <= REQ_ELECTRICITY_LEVEL) return 0;
+  let p = 30 + (level - REQ_ELECTRICITY_LEVEL) * 10;
+  if (level >= MEGA_CITY_FOG_LEVEL) p += (1 + level - MEGA_CITY_FOG_LEVEL) * 10;
+  return p * factor * (mega ? 1.5 : 1);
+}
+
 export function analyze(plan, settings) {
   const { w, h, terrain, bld, pave } = plan;
   const rail = plan.rail || []; // rails sharing a road tile (level crossings)
@@ -256,6 +267,29 @@ export function analyze(plan, settings) {
     for (const [k, v] of Object.entries(railB.cost || {})) if (typeof v === 'number') totals.cost[k] = (totals.cost[k] || 0) + v;
     totals.counts.rail = (totals.counts.rail || 0) + 1;
   }
+
+  // Pollution the game counts from the map itself, besides buildings and roads (hrac_income_stats.js):
+  // every forest tile cleans by its forest level, every deep water tile by 2, towns past level 20 pollute,
+  // and Stop Burping, Cows (upgrade 200) makes each farm field clean. Then account-wide amounts that
+  // aren't on the map at all (base pollution, purchases, cleared barrels…), from the account profile.
+  const P = settings.pollution || {};
+  const forestLvl = plan.forest || [], townLvl = plan.town || [];
+  let forest = 0, deep = 0, towns = 0;
+  for (let i = 0; i < n; i++) {
+    const f = forestLvl[i] || (terrain[i] === 'forest' ? 1 : 0);
+    if (f) forest -= f;
+    if (terrain[i] === 'deepwater') deep -= DEEP_WATER_POLLUTION;
+    if (townLvl[i]) towns += townPollution(townLvl[i], terrain[i] === 'megacity', P.townFactor ?? 1);
+  }
+  if (P.forestBonusPct) forest += Math.round(forest * 0.01 * P.forestBonusPct);
+  towns = Math.round(towns);
+  const fields = -fieldOwner.size * (P.fieldBonus || 0);
+  const account = P.account || 0;
+  totals.pollParts = { buildings: totals.poll, forest, deep, towns, fields, account };
+  for (const v of [forest, deep, towns, fields, account]) {
+    totals.poll += v; if (v > 0) totals.pollAdd += v; else totals.pollRem -= v;
+  }
+  totals.pollAccountParts = P.parts || null;
 
   const rank = { bad: 0, warn: 1, info: 2 };
   issues.sort((a, b) => rank[a.lvl] - rank[b.lvl]);

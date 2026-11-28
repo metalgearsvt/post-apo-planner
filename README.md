@@ -13,14 +13,16 @@ home screen, and works offline. There's no build step — plain HTML/CSS/JS.
   (level, cost, power, pollution, income, storage, allowed tiles, radius), with the community wiki as a fallback.
 - **Placement checks**: wrong tile type, Coal Plant within 2 of water, Iron Mine needs a Foundry within 3,
   Lumber Mill needs Forest in range, overlapping farms, road connection to a settlement, and more.
-- **Calculations**: net power and pollution, income per 9 s / per hour, total build cost, farm fields,
+- **Calculations**: net power and pollution (buildings and roads, plus forest tiles, deep water and towns the way
+  the game counts them), income per 9 s / per hour, total build cost, farm fields,
   pavement bonuses, Stone Conveyor and Tanker boosts, upgrade toggles (Big Farms, Advanced Saw, and others).
 - **Catalog editor**: fix numbers the wiki is missing, or add custom buildings and tiles.
 - **Game icons (optional, local only)**: build an icon pack from your own copy of the game and the planner draws
   real building and terrain art. No game art is included in this repository or the hosted app.
   Menu → Game icons… also exports a pack file you can import on your phone.
 - **Your account values (optional)**: Menu → My account values… loads a profile of the building values your
-  upgrades produce, so production, power, pollution, costs, ranges and storage match your game.
+  upgrades produce, so production, power, pollution, costs, ranges and storage match your game. It also carries
+  the pollution that isn't on the map (base +100,005, anti-pollution, cleared barrels…), so the total matches the game's.
 - **Import your game map**: Menu → Import game map… turns a map exported from the game into a plan
   (the whole map, or any area of it up to 1000 × 1000 tiles; buildings, roads, rails and pavement included).
 - **Phone ↔ desktop**: share codes (copy/paste text) or export/import JSON files.

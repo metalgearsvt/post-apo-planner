@@ -35,7 +35,9 @@ function encodePlan(p) {
   const b = []; p.bld.forEach((id, i) => { if (id) b.push([i, id]); });
   const pv = []; p.pave.forEach((v, i) => { if (v) pv.push(i); });
   const rx = []; p.rail.forEach((v, i) => { if (v) rx.push(i); });
-  return { id: p.id, name: p.name, w: p.w, h: p.h, t, b, p: pv, x: rx, updated: Date.now(), view: p.view };
+  const fl = []; p.forest.forEach((v, i) => { if (v) fl.push([i, v]); });
+  const tl = []; p.town.forEach((v, i) => { if (v) tl.push([i, v]); });
+  return { id: p.id, name: p.name, w: p.w, h: p.h, t, b, p: pv, x: rx, f: fl, tl, updated: Date.now(), view: p.view };
 }
 function decodePlan(e) {
   const n = e.w * e.h;
@@ -45,11 +47,14 @@ function decodePlan(e) {
   const bld = new Array(n).fill(null); for (const [i, id] of e.b || []) if (i < n) bld[i] = id;
   const pave = new Array(n).fill(0); for (const i of e.p || []) if (i < n) pave[i] = 1;
   const rail = new Array(n).fill(0); for (const i of e.x || []) if (i < n) rail[i] = 1;
-  return { id: e.id, name: e.name, w: e.w, h: e.h, terrain, bld, pave, rail, view: readJSON(LS.views, {})[e.id] || e.view };
+  const forest = new Array(n).fill(0); for (const [i, v] of e.f || []) if (i < n) forest[i] = v;
+  const town = new Array(n).fill(0); for (const [i, v] of e.tl || []) if (i < n) town[i] = v;
+  return { id: e.id, name: e.name, w: e.w, h: e.h, terrain, bld, pave, rail, forest, town, view: readJSON(LS.views, {})[e.id] || e.view };
 }
 function makePlan(name, w, h, fill = 'grass', withMain = true) {
   const n = w * h;
-  const p = { id: uid(), name, w, h, terrain: new Array(n).fill(fill), bld: new Array(n).fill(null), pave: new Array(n).fill(0), rail: new Array(n).fill(0) };
+  const p = { id: uid(), name, w, h, terrain: new Array(n).fill(fill), bld: new Array(n).fill(null), pave: new Array(n).fill(0), rail: new Array(n).fill(0),
+    forest: new Array(n).fill(0), town: new Array(n).fill(0) };
   if (withMain) p.terrain[((h / 2) | 0) * w + ((w / 2) | 0)] = 'mainsettlement';
   return p;
 }
@@ -109,7 +114,7 @@ function analysisSettings() {
   if (!profileActive()) return settings;
   const p = getProfile(), up = { ...settings.upgrades, ...(p.upgrades || {}) };
   for (const k of p.baked || []) up[k] = false;
-  return { ...settings, upgrades: up };
+  return { ...settings, upgrades: up, pollution: p.pollution };
 }
 function reanalyze() { result = analyze(plan, analysisSettings()); }
 // On big plans a full re-check on every pointer move makes painting stutter; it runs once when the stroke ends instead.
@@ -170,7 +175,8 @@ function changed(save = true) {
 
 function applyTool(i, mode) {
   if (i < 0) return;
-  if (tool === 'terrain') setCell(i, 'terrain', selTerrain);
+  // New terrain drops the imported forest / town level of the tile (painted Forest counts as level 1).
+  if (tool === 'terrain') { if (setCell(i, 'terrain', selTerrain)) { setCell(i, 'forest', 0); setCell(i, 'town', 0); } }
   else if (tool === 'build') {
     const b = catalog.bMap.get(selBuilding);
     const cur = catalog.bMap.get(plan.bld[i]);
@@ -840,6 +846,18 @@ $('#palHideLocked').addEventListener('change', (e) => { settings.hideLocked = e.
 // =====================================================================
 // Totals tab
 // =====================================================================
+// Where the pollution total comes from, the way the game adds it up.
+function pollRows(T) {
+  const P = T.pollParts; if (!P) return '';
+  const rows = [['Buildings, roads & rails', P.buildings], ['Forest tiles', P.forest], ['Deep water tiles (−2 each)', P.deep],
+    ['Towns', P.towns], ['Farm fields (Stop Burping, Cows)', P.fields]].filter(([, v]) => v);
+  const acc = T.pollAccountParts || [];
+  const html = (r) => r.map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${sign(v)}</td></tr>`).join('');
+  return `<h3>Pollution</h3><table class="kv">${html(rows)}
+    ${acc.length ? `<tr><td colspan="2" class="muted small">Your account, not on the map:</td></tr>${html(acc)}` : ''}
+    <tr><td><b>Total</b></td><td class="n"><b>${sign(T.poll)}</b></td></tr></table>
+    ${acc.length ? '' : '<p class="note">The game also adds account-wide amounts (base +100,005, anti-pollution, cleared barrels…). Load your account values (Menu → My account values) to include them.</p>'}`;
+}
 function renderStats() {
   const el = $('#tab-stats'); if (!result) return;
   const T = result.totals;
@@ -864,6 +882,7 @@ function renderStats() {
     ${net < 0 ? '<div class="issue">Power deficit — in game, all incomes drop proportionally until energy is balanced.</div>' : ''}
     <h3>Income</h3>
     ${resRows ? `<table class="kv"><tr><th>Resource</th><th class="n">per 9s</th><th class="n">per hour</th></tr>${resRows}</table>` : '<p class="muted small">No production yet.</p>'}
+    ${pollRows(T)}
     <h3>Build cost (total)</h3>
     ${costRows ? `<table class="kv">${costRows}</table>` : '<p class="muted small">—</p>'}
     <h3>Issues</h3>
@@ -1071,6 +1090,7 @@ async function resizeDialog() {
     const X = x + dx, Y = y + dy; if (X < 0 || Y < 0 || X >= nw || Y >= nh) continue;
     const s = y * plan.w + x, t = Y * nw + X;
     np.terrain[t] = plan.terrain[s]; np.bld[t] = plan.bld[s]; np.pave[t] = plan.pave[s]; np.rail[t] = plan.rail[s];
+    np.forest[t] = plan.forest[s]; np.town[t] = plan.town[s];
   }
   plan = np; switchedPlan(true);
 }
@@ -1293,7 +1313,7 @@ async function gameMapDialog(grid, fileName) {
   const region = { cx: +v.cx | 0, cy: +v.cy | 0, w: clamp(+v.w, 3, MAX_SIDE), h: clamp(+v.h, 3, MAX_SIDE) };
   const r = gridToPlan(grid, region, catalog.buildings);
   persistPlan(true);
-  plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave, rail: r.rail };
+  plan = { id: uid(), name: v.name || 'Game map', w: r.w, h: r.h, terrain: r.terrain, bld: r.bld, pave: r.pave, rail: r.rail, forest: r.forest, town: r.town };
   switchedPlan(true);
   const odd = Object.entries(r.report.unmatched);
   toast(`Imported ${fmt(r.report.buildings)} buildings and ${fmt(r.report.roads)} roads` + (odd.length ? ` (${odd.length} unknown building type(s) skipped)` : ''), 5000);
